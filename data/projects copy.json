@@ -1,0 +1,93 @@
+{
+  "section": {
+    "index": "02 / Selected work",
+    "heading": "Things I have",
+    "headingAccent": "built.",
+    "interactionHint": "Drag or use arrows"
+  },
+  "projects": [
+    {
+      "id": "mailmind",
+      "number": "02",
+      "title": "MailMind",
+      "eyebrow": "Your inbox, understood",
+      "description": "An AI-powered email intelligence platform that extracts tasks, meetings, orders and useful information from emails while preparing replies for the user to review.",
+      "url": "https://github.com/maybethemuhammadibrahim/MailMind",
+      "year": "2026",
+      "accent": "#D4922A",
+      "mark": "M",
+      "meta": {
+        "label": "AI product",
+        "type": "Email intelligence"
+      },
+      "visual": {
+        "type": "image",
+        "src": "assets/projects/mailmind-preview.webp",
+        "alt": "MailMind email intelligence dashboard",
+        "position": "center"
+      },
+      "tags": [
+        "Python",
+        "React",
+        "AI",
+        "Gmail API"
+      ]
+    },
+    {
+      "id": "flexplus",
+      "number": "01",
+      "title": "FlexPlus",
+      "eyebrow": "A better university portal",
+      "description": "A browser extension that redesigns the FAST NUCES student portal into a calmer, clearer and more useful experience.",
+      "url": "https://github.com/mibrahimfiftysix/flexplus",
+      "year": "2026",
+      "accent": "#E84B1A",
+      "mark": "F+",
+      "meta": {
+        "label": "Featured project",
+        "type": "Web utility"
+      },
+      "visual": {
+        "type": "browser",
+        "src": "assets/projects/home.gif",
+        "alt": "FlexPlus browser extension interface",
+        "browserUrl": "flexstudent.nu.edu.pk",
+        "position": "top center"
+      },
+      "tags": [
+        "JavaScript",
+        "HTML",
+        "CSS",
+        "Browser APIs"
+      ]
+    },
+    {
+      "id": "sepsis-analysis",
+      "number": "03",
+      "title": "Sepsis Analysis",
+      "eyebrow": "Earlier warning from ICU data",
+      "description": "A machine-learning pipeline designed to identify patients at risk of sepsis using irregular and highly incomplete ICU time-series data.",
+      "url": "https://github.com/mibrahimfiftysix/sepsis-analysis",
+      "year": "2026",
+      "accent": "#617A69",
+      "mark": "S",
+      "meta": {
+        "label": "Machine-learning study",
+        "type": "Healthcare"
+      },
+      "visual": {
+        "type": "image",
+        "src": "assets/projects/sepsis-preview.webp",
+        "alt": "Sepsis onset analysis dashboard",
+        "position": "center"
+      },
+      "tags": [
+        "Python",
+        "Machine Learning",
+        "Time Series",
+        "Healthcare"
+      ]
+    }
+  ]
+}
+
