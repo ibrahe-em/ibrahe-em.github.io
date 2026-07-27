@@ -1,0 +1,144 @@
+================================================================================
+PORTFOLIO — FEATURE / SECTION BACKLOG
+Written 2026-07-27
+Goal: give recruiters and clients a platform that shows potential + creativity,
+not just a list of repos.
+
+Context: the mobile responsive pass is already done (hero, bottom-sheet modal,
+touch targets, hover gating, asset compression). This file is about CONTENT and
+NEW SECTIONS, not layout.
+================================================================================
+
+
+--------------------------------------------------------------------------------
+[ ] 0. THE BLOCKER — REAL PROJECT MEDIA
+--------------------------------------------------------------------------------
+All 12 screenshot slots across all 4 projects point at the SAME placeholder:
+    assets/projects/generic.png  ("Will Upload Soon")
+
+This is the payoff moment. Someone was interested enough to tap into the modal,
+and they get a placeholder. No new section will outperform fixing this.
+
+  [ ] Capture real screenshots — even 1 real shot beats 3 placeholders
+  [ ] Better: 8-15 second SILENT .webm loops of each thing actually running
+  [ ] FlexPlus especially: a before/after of the FAST portal is self-evidently
+      persuasive in a way prose is not
+  [ ] Needs: per-project folders (assets/projects/<id>/), a naming convention,
+      and webm support in the album carousel w/ poster-image fallback
+
+
+--------------------------------------------------------------------------------
+HIGHEST LEVERAGE, LOW EFFORT
+--------------------------------------------------------------------------------
+
+[ ] 1. SOCIAL PREVIEW CARD + FAVICON
+    Currently: NO Open Graph tags, NO Twitter card, NO favicon file at all.
+    Portfolios spread as pasted links — LinkedIn DMs, WhatsApp, email to a
+    hiring manager. Every one of those currently renders as a naked URL with a
+    blank tab icon.
+      [ ] og:title / og:description / og:image / og:url / twitter:card
+      [ ] 1200x630 preview image
+      [ ] favicon set (.ico + apple-touch-icon)
+    ~30 lines of <meta> + one image. Multiplies the reach of everything else.
+
+[ ] 2. ABOUT SECTION WITH A REAL PHOTO
+    The site has a cat but no human. It never actually says I'm a CS student at
+    FAST NUCES — that's only inferable from the FlexPlus project description.
+    Recruiters hire people.
+      [ ] One narrative paragraph — who, where studying, what I'm drawn to
+      [ ] An actual photo of me
+      [ ] Education / current year
+
+[ ] 3. AVAILABILITY LINE + REAL CTA
+    Neither a client nor a recruiter can currently tell whether I want an
+    internship, freelance work, or full-time.
+      [ ] One sentence, e.g. "Open to internships and freelance ML work —
+          currently in my final year"
+      [ ] A primary contact button (not just the footer mailto icon)
+    Turns a gallery into a platform.
+
+[ ] 4. SELF-HOSTED CV
+    Currently a Google Drive link. Those rot when permissions lapse, get blocked
+    on corporate networks, and add a click.
+      [ ] Commit cv.pdf to the repo, link that instead
+
+
+--------------------------------------------------------------------------------
+DEPTH THAT PROVES POTENTIAL
+--------------------------------------------------------------------------------
+
+[ ] 5. ADD OUTCOMES TO EACH PROJECT
+    The modal goes Problem -> Solution -> Stack, and stops right before the
+    interesting part.
+      [ ] "Results" block — F1 score on the PhysioNet set, hours cut per
+          lookbook, number of students using FlexPlus, etc.
+      [ ] "What I'd do differently" block
+    That second one signals engineering maturity more than anything else on a
+    portfolio. Most students never write it.
+    Implementation: extend the projects.json detail schema + the bento grid.
+
+[ ] 6. LIVE DEMOS — OR AT LEAST ONE
+    Four GitHub links reads as coursework. One thing a person can click and use
+    reads as shipped software.
+      [ ] FlexPlus -> Chrome Web Store listing
+      [ ] Lookbook Cropper -> hosted demo or video walkthrough
+
+
+--------------------------------------------------------------------------------
+THE CREATIVITY PLAY  <-- spend real effort here
+--------------------------------------------------------------------------------
+
+[ ] 7. A "LAB" SECTION WITH SOMETHING GENUINELY INTERACTIVE
+
+    STRONGEST VERSION: make the Sepsis model touchable.
+      [ ] Export the model to ONNX
+      [ ] Run it in-browser with ONNX Runtime Web
+      [ ] Sliders for a few vitals -> live risk score
+    Converts the most impressive-but-invisible project from a repo link into
+    something a recruiter can play with in 10 seconds. Nobody forgets that.
+    Also proves the ML is real, which a README cannot.
+
+    Cheaper variants if ONNX export is a pain:
+      [ ] MediaPipe webcam demo (on-brand for the Computer Vision tag)
+      [ ] Draw-a-digit classifier
+
+[ ] 8. SURFACE THE EASTER EGGS THAT ALREADY EXIST
+    The konami wobble, the cat click counter, the PKT clock — nobody will ever
+    find the konami code. The personality is already written and completely
+    invisible.
+      [ ] A small discoverable hint, or
+      [ ] A "/" command palette
+    Gets credit for work already done.
+
+
+--------------------------------------------------------------------------------
+WORTH DOING EVENTUALLY
+--------------------------------------------------------------------------------
+
+[ ] 9.  CUSTOM DOMAIN — ~$12/yr. "muhammadibrahim.dev" on a CV reads very
+        differently from "ibrahe-em.github.io".
+
+[ ] 10. PRIVACY-FRIENDLY ANALYTICS — GoatCounter or Plausible, so I actually
+        know whether people open the project modals.
+
+[ ] 11. WRITING / BUILD NOTES — 2-3 short posts. Highest ceiling for showing
+        communication ability (the thing a repo can't show), but the biggest
+        ongoing commitment. e.g. "Why irregular ICU time-series break standard
+        imputation".
+
+[ ] 12. TAG FILTERING — NOT YET. At 4 projects it's overhead. Revisit past ~8.
+
+[ ] 13. SHOW THE `year` FIELD ON CARDS — projects.json already carries unused
+        `year`, `mark`, and `index` fields. Showing `year` gives a sense of
+        trajectory for free.
+
+[ ] 14. MODAL FOCUS TRAP — the modal doesn't trap focus or restore it on close.
+        Cheap to fix, and accessibility awareness is itself a signal to anyone
+        who checks.
+
+
+================================================================================
+SUGGESTED ORDER IF SHORT ON TIME:
+  0 (media) -> 1 (social card) -> 3 (availability) -> 2 (about) -> 5 (results)
+  -> 7 (lab)
+================================================================================
