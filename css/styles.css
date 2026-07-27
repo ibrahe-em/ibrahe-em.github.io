@@ -7,7 +7,9 @@
 /* Local font faces */
 @font-face {
   font-family: 'Rubik';
-  src: url('../assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype-variations');
+  /* woff2 is ~69% smaller than the raw TTF; the TTF stays as a fallback. */
+  src: url('../assets/fonts/Rubik-VariableFont_wght.woff2') format('woff2'),
+       url('../assets/fonts/Rubik-VariableFont_wght.ttf') format('truetype-variations');
   font-weight: 100 900;
   font-display: swap;
 }
@@ -94,6 +96,9 @@ html {
 
 body {
   margin: 0;
+  /* Keep content clear of notches and rounded display corners. */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font-sans);
@@ -101,15 +106,18 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ---------- theme toggle & clouds ---------- */
 
 .theme-toggle {
-  position: absolute;
-  top: clamp(16px, 3vw, 24px);
-  right: var(--pad);
-  z-index: 10;
+  /* Fixed, not absolute — on a long mobile page the toggle should stay
+     reachable instead of scrolling away at the top. */
+  position: fixed;
+  top: calc(clamp(16px, 3vw, 24px) + env(safe-area-inset-top));
+  right: calc(var(--pad) + env(safe-area-inset-right));
+  z-index: 70;
   width: 46px;
   height: 46px;
   padding: 0;
@@ -120,10 +128,6 @@ body {
   place-items: center;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.12));
   transition: transform 0.2s cubic-bezier(0.34, 1.1, 0.64, 1);
-}
-
-.theme-toggle:hover {
-  transform: scale(1.12);
 }
 
 .theme-toggle:active {
@@ -340,7 +344,6 @@ button {
   transform-origin: center center;
 }
 
-.intro-image-wrapper:hover .intro-image,
 .intro-image.zoomed {
   transform: scale(1.08);
 }
@@ -405,12 +408,6 @@ button {
   transition: border-color 0.25s var(--ease), color 0.25s var(--ease);
 }
 
-.intro-tags li:hover,
-.project-tags li:hover {
-  border-color: var(--ink);
-  color: var(--ink);
-}
-
 .scroll-cue {
   display: inline-flex;
   align-items: center;
@@ -454,10 +451,6 @@ button {
   50% {
     transform: translateX(4px) rotate(45deg);
   }
-}
-
-.scroll-cue:hover {
-  color: var(--ink);
 }
 
 /* ---------- work section ---------- */
@@ -511,9 +504,18 @@ button {
   z-index: -1;
 }
 
-.project-card:hover,
-.project-card:hover::after {
-  border-color: var(--accent, var(--ink));
+/* Touch press feedback — mobile has no hover to signal "this is tappable". */
+.project-card:has(.project-link:active),
+.project-card:has(.project-link:active)::after {
+  border-color: var(--project-accent, var(--ink));
+}
+
+.project-card:has(.project-link:active) {
+  transform: scale(0.985);
+}
+
+.project-card {
+  transition: transform 0.16s var(--ease), border-color 0.2s var(--ease);
 }
 
 /* Featured project indicator */
@@ -640,7 +642,7 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 26px var(--pad) 34px;
+  padding: 26px var(--pad) calc(34px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--line);
   font-family: var(--font-mono);
   font-size: 0.76rem;
@@ -660,10 +662,6 @@ button {
   transition: color 0.2s var(--ease);
 }
 
-.footer-clock:hover {
-  color: var(--muted);
-}
-
 .social-links {
   display: flex;
   align-items: center;
@@ -672,8 +670,8 @@ button {
 }
 
 .social-link {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -690,12 +688,11 @@ button {
   fill: currentColor;
 }
 
-.social-link:hover,
-.social-link:focus-visible {
+.social-link:focus-visible,
+.social-link:active {
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
-  transform: translateY(-2px);
 }
 
 /* ---------- project detail modal ---------- */
@@ -731,7 +728,7 @@ button {
   border-radius: 4px;
   width: 100%;
   max-width: 860px;
-  max-height: 85vh;
+  max-height: 85dvh;
   overflow: hidden;
   padding: 24px;
   position: relative;
@@ -815,7 +812,7 @@ button {
   white-space: nowrap;
 }
 
-.modal-link:hover {
+.modal-link:active {
   color: var(--ink);
   border-color: var(--ink);
 }
@@ -827,8 +824,8 @@ button {
 }
 
 .modal-close {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -843,7 +840,7 @@ button {
   transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
-.modal-close:hover {
+.modal-close:active {
   color: var(--ink);
   border-color: var(--ink);
 }
@@ -858,7 +855,7 @@ button {
     "album    info"
     "stack    stack";
   gap: 12px;
-  height: calc(85vh - 110px);
+  height: calc(85dvh - 110px);
   max-height: 520px;
 }
 
@@ -939,21 +936,19 @@ button {
   box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.12);
 }
 
-.album-photo:hover {
-  opacity: 0.85;
-}
-
-.album-photo[data-pos="0"]:hover {
-  opacity: 1;
-}
-
 .album-hint {
   font-family: var(--font-mono);
   font-size: 0.58rem;
   color: var(--faint);
   text-align: center;
-  margin-top: 8px;
+  margin: 8px 0 0;
   letter-spacing: 0.04em;
+}
+
+/* Both are mobile-only affordances; the desktop modal keeps the card stack. */
+.sheet-handle,
+.album-dots {
+  display: none;
 }
 
 /* ---------- lightbox ---------- */
@@ -979,7 +974,7 @@ button {
 
 .lightbox img {
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 90dvh;
   object-fit: contain;
   border-radius: 4px;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.2);
@@ -989,6 +984,32 @@ button {
 
 .lightbox.open img {
   transform: scale(1);
+}
+
+/* Tap-anywhere still closes, but it is invisible — and there is no ESC on a
+   phone, which was the only other way out. */
+.lightbox-close {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: calc(16px + env(safe-area-inset-right));
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-close:active {
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 /* ---------- info cell (problem + solution stacked) ---------- */
@@ -1065,7 +1086,7 @@ button {
 @media (max-width: 640px) {
   .bento-grid {
     grid-template-columns: 1fr;
-    grid-template-rows: 200px auto auto;
+    grid-template-rows: 270px auto auto;
     grid-template-areas:
       "album"
       "info"
@@ -1074,18 +1095,124 @@ button {
     height: auto;
   }
 
+  /* Bottom sheet. A centered dialog wastes a narrow viewport and parks its
+     controls mid-screen; a sheet anchors them where the thumb already is. */
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
   .modal-content {
-    padding: 18px;
-    max-height: 90vh;
+    width: 100%;
+    max-width: none;
+    max-height: 92dvh;
+    padding: 0 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+    border-bottom: none;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateY(100%);
+    transition: transform 0.3s var(--ease);
+  }
+
+  .modal-overlay.open .modal-content {
+    transform: translateY(0);
+  }
+
+  /* Title and close stay pinned while the body scrolls under them. */
+  .modal-sticky-head {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg);
+  }
+
+  .sheet-handle {
+    display: block;
+    padding: 10px 0 8px;
+    touch-action: none;
+  }
+
+  .sheet-handle::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: var(--line);
   }
 
   .modal-link span {
     display: none;
   }
 
+  /* The modal is the only scroll container on mobile — a capped, separately
+     scrolling info cell hid "My Solution" entirely with no affordance. */
   .bento-info {
-    max-height: 250px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Album: snap carousel instead of the absolutely-positioned card stack,
+     which collapsed to an undiscoverable tap target at this size. */
+  .album-stack {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .album-stack::-webkit-scrollbar {
+    display: none;
+  }
+
+  .album-stack .album-photo[data-pos] {
+    position: static;
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform: none;
+    opacity: 1;
+    box-shadow: none;
+  }
+
+  .album-dots {
+    display: flex;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 4px;
+  }
+
+  .album-dot {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .album-dot::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--line);
+    transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+  }
+
+  .album-dot.active::before {
+    background: var(--muted);
+    transform: scale(1.35);
   }
 }
 
@@ -1119,33 +1246,155 @@ button {
   animation: wobble 0.6s var(--ease);
 }
 
+/* ---------- hover states ----------
+   Gated behind a real pointer. Touch browsers emulate :hover on tap and then
+   leave it stuck until you tap elsewhere, so unguarded hover rules read as
+   bugs on a phone. Press feedback lives in :active rules above. */
+
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover {
+    transform: scale(1.12);
+  }
+
+  .intro-image-wrapper:hover .intro-image {
+    transform: scale(1.08);
+  }
+
+  .intro-tags li:hover,
+  .project-tags li:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .scroll-cue:hover {
+    color: var(--ink);
+  }
+
+  .project-card:hover,
+  .project-card:hover::after {
+    border-color: var(--accent, var(--ink));
+  }
+
+  .footer-clock:hover {
+    color: var(--muted);
+  }
+
+  .social-link:hover {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .modal-link:hover,
+  .modal-close:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .album-photo:hover {
+    opacity: 0.85;
+  }
+
+  .album-photo[data-pos="0"]:hover {
+    opacity: 1;
+  }
+}
+
 /* ---------- responsive ---------- */
 
+/* Tablets, foldables and large phones in landscape — the old stylesheet
+   jumped straight from the desktop grid to a single column. */
+@media (min-width: 641px) and (max-width: 900px) {
+  :root {
+    --project-card-min: 300px;
+  }
+
+  .intro {
+    min-height: 70svh;
+  }
+
+  .intro-tags {
+    margin-bottom: 48px;
+  }
+}
+
 @media (max-width: 640px) {
+  /* --content-width already subtracts a --pad gutter from each side, and then
+     every section adds var(--pad) of its own padding on top. On desktop that
+     double inset is invisible; on a 320px phone it burned 40px per side and
+     left only 240px of usable width. Let the sections own the gutter. */
+  :root {
+    --content-width: 100%;
+  }
+
   .site-nav {
     display: none;
   }
 
   .work-head {
     align-items: flex-start;
+    margin-bottom: 28px;
   }
 
   .projects-grid {
     grid-template-columns: 1fr;
   }
 
-  /* hide intro image and keep text centered on small screens */
-  .intro-image-wrapper {
-    display: none;
+  /* Hero stays left-aligned like the rest of the column; the image sits
+     beside the name and shrinks enough to leave "Muhammad" room to sit
+     on its own line. */
+  .intro {
+    min-height: 62svh;
+    padding-top: calc(var(--pad) + 46px + env(safe-area-inset-top));
+  }
+
+  /* "Muhammad" is one unbreakable word ~5.6em wide, and .intro-name has
+     min-width: 0 — so if the column gets too narrow the word overflows into
+     the image instead of wrapping. The image takes a percentage (not a vw)
+     so the name's share of the row is stable, and the font is capped low
+     enough that the word still clears it at 320px. */
+  .intro-name {
+    font-size: clamp(1.55rem, 9.6vw, 3rem);
+    margin-bottom: 16px;
   }
 
   .name-container {
-    justify-content: center;
+    gap: 14px;
+    align-items: flex-start;
   }
 
-  .intro-name {
-    text-align: center;
-    font-weight: 500;
+  .intro-image-wrapper {
+    width: 28%;
+    min-width: 70px;
+    max-width: 110px;
+    margin-top: 4px;
+  }
+
+  .intro-lead {
+    margin: 12px 0 26px;
+  }
+
+  .intro-tags {
+    margin-bottom: 40px;
+  }
+
+  /* Sub-0.7rem type lands around 9-10px on a phone — under the legibility
+     floor. Nudge the smallest labels back up. */
+  .project-top,
+  .project-tags li,
+  .bento-label {
+    font-size: 0.72rem;
+  }
+
+  .album-hint,
+  .click-counter {
+    font-size: 0.66rem;
+  }
+
+  .stack-item {
+    font-size: 0.74rem;
+    padding: 7px 12px;
   }
 
   .footer-clock {

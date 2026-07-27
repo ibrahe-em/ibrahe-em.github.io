@@ -32,6 +32,9 @@
       const newTheme = currentTheme === "dark" ? "light" : "dark";
       document.documentElement.setAttribute("data-theme", newTheme);
       localStorage.setItem("theme", newTheme);
+
+      const meta = $('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", newTheme === "dark" ? "#141210" : "#f5efe6");
     });
   }
 
@@ -186,6 +189,8 @@
       .join("");
 
     modalContent.innerHTML = `
+      <div class="modal-sticky-head">
+      <div class="sheet-handle" aria-hidden="true"></div>
       <div class="modal-header">
         <div class="modal-header-left">
           <h2 class="modal-title">${project.title}</h2>
@@ -199,6 +204,7 @@
           <button class="modal-close" id="modalClose" aria-label="Close modal">×</button>
         </div>
       </div>
+      </div>
 
       <div class="bento-grid">
         <div class="bento-cell bento-album">
@@ -206,6 +212,8 @@
           <div class="album-stack" id="albumStack">
             ${albumHTML}
           </div>
+          <div class="album-dots" id="albumDots" role="tablist" aria-label="Screenshot navigation"></div>
+          <p class="album-hint" id="albumHint"></p>
         </div>
 
         <div class="bento-cell bento-info">
@@ -230,6 +238,7 @@
 
     // Photo album click-to-front
     initAlbum();
+    initSheetDrag();
 
     // Lock body scroll
     document.body.style.overflow = "hidden";
@@ -241,22 +250,34 @@
     if (closeBtn) closeBtn.focus();
   }
 
+  /* The shuffled card-stack reads well with a cursor but is undiscoverable
+     on a phone, where it shrinks to a ~240px box with no swipe. Below the
+     mobile breakpoint the same markup becomes a snap-scrolling carousel. */
+  const MOBILE_QUERY = "(max-width: 640px)";
+
+  function isMobileLayout() {
+    return window.matchMedia(MOBILE_QUERY).matches;
+  }
+
   function initAlbum() {
     const stack = $("#albumStack");
     if (!stack) return;
 
+    const photos = Array.from(stack.querySelectorAll(".album-photo"));
+
+    // Both behaviours are wired up, and each click decides which applies from
+    // the *current* layout — otherwise rotating the phone while the modal is
+    // open would leave the handlers in the wrong mode.
     stack.addEventListener("click", (e) => {
       const clicked = e.target.closest(".album-photo");
       if (!clicked) return;
 
-      if (clicked.dataset.pos === "0") {
+      if (isMobileLayout() || clicked.dataset.pos === "0") {
         openLightbox(clicked.src, clicked.alt);
         return;
       }
 
-      const photos = Array.from(stack.querySelectorAll(".album-photo"));
       const total = photos.length;
-
       // Bring clicked photo to front: rotate positions
       const clickedPos = parseInt(clicked.dataset.pos, 10);
 
@@ -267,6 +288,109 @@
         photo.dataset.pos = newPos;
       });
     });
+
+    initAlbumCarousel(stack, photos);
+    updateAlbumHint();
+  }
+
+  // Registered once — the modal rebuilds its markup on every open, so a
+  // per-open listener would accumulate.
+  window.addEventListener("resize", updateAlbumHint);
+
+  function updateAlbumHint() {
+    const hint = $("#albumHint");
+    if (!hint) return;
+
+    const count = document.querySelectorAll("#albumStack .album-photo").length;
+
+    if (isMobileLayout()) {
+      hint.textContent = count > 1 ? "Swipe to browse · tap to enlarge" : "Tap to enlarge";
+    } else {
+      hint.textContent = count > 1 ? "Click to shuffle · click front to enlarge" : "Click to enlarge";
+    }
+  }
+
+  /* Dots are built regardless of layout — CSS hides them above the mobile
+     breakpoint, so a rotation needs no rebuild. */
+  function initAlbumCarousel(stack, photos) {
+    const dotsEl = $("#albumDots");
+
+    if (dotsEl && photos.length > 1) {
+      dotsEl.innerHTML = photos
+        .map((_, i) =>
+          `<button class="album-dot${i === 0 ? " active" : ""}" type="button" role="tab" aria-label="Screenshot ${i + 1}"${i === 0 ? ' aria-selected="true"' : ''}></button>`
+        )
+        .join("");
+
+      dotsEl.addEventListener("click", (e) => {
+        const dot = e.target.closest(".album-dot");
+        if (!dot) return;
+        const i = Array.from(dotsEl.children).indexOf(dot);
+        // Scroll the strip itself rather than scrollIntoView, which would
+        // also drag the surrounding sheet.
+        stack.scrollTo({ left: i * stack.clientWidth, behavior: "smooth" });
+      });
+    }
+
+    let ticking = false;
+    stack.addEventListener("scroll", () => {
+      if (ticking || !dotsEl) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const width = stack.clientWidth || 1;
+        const active = Math.round(stack.scrollLeft / width);
+        Array.from(dotsEl.children).forEach((dot, i) => {
+          const on = i === active;
+          dot.classList.toggle("active", on);
+          if (on) {
+            dot.setAttribute("aria-selected", "true");
+          } else {
+            dot.removeAttribute("aria-selected");
+          }
+        });
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  /* ---------- bottom-sheet drag-to-dismiss ---------- */
+
+  function initSheetDrag() {
+    if (!isMobileLayout()) return;
+
+    const head = modalContent.querySelector(".modal-sticky-head");
+    if (!head) return;
+
+    let startY = 0;
+    let delta = 0;
+    let dragging = false;
+
+    // Only the header drags. Dragging from the body would fight the sheet's
+    // own vertical scrolling.
+    head.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      dragging = true;
+      startY = e.touches[0].clientY;
+      delta = 0;
+      modalContent.style.transition = "none";
+    }, { passive: true });
+
+    head.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      delta = Math.max(0, e.touches[0].clientY - startY);
+      modalContent.style.transform = `translateY(${delta}px)`;
+    }, { passive: true });
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      modalContent.style.transition = "";
+      modalContent.style.transform = "";
+      if (delta > 110) closeModal();
+    }
+
+    head.addEventListener("touchend", endDrag);
+    head.addEventListener("touchcancel", endDrag);
   }
 
   /* ---------- lightbox ---------- */
@@ -278,7 +402,10 @@
       lightboxOverlay = document.createElement("div");
       lightboxOverlay.className = "lightbox";
       lightboxOverlay.setAttribute("aria-hidden", "true");
-      lightboxOverlay.innerHTML = `<img src="" alt="" />`;
+      // A visible close button — tap-anywhere works but is invisible, and
+      // there is no ESC key on a phone.
+      lightboxOverlay.innerHTML =
+        `<button class="lightbox-close" type="button" aria-label="Close image">×</button><img src="" alt="" />`;
       document.body.appendChild(lightboxOverlay);
 
       lightboxOverlay.addEventListener("click", () => {

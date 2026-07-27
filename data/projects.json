@@ -28,9 +28,9 @@
         { "name": "PostgreSQL", "icon": "postgresql" }
       ],
       "screenshots": [
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png"
+        "assets/projects/generic.png",
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
       ]
     }
   },
@@ -62,9 +62,9 @@
         { "name": "DOM", "icon": "dom" }
       ],
       "screenshots": [
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png"
+        "assets/projects/generic.png",
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
       ]
     }
   },
@@ -96,9 +96,9 @@
         { "name": "XGBoost", "icon": "xgboost" }
       ],
       "screenshots": [
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png"
+        "assets/projects/generic.png",
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
       ]
     }
   },
@@ -130,9 +130,9 @@
         { "name": "OpenCV", "icon": "opencv" }
       ],
       "screenshots": [
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png",
-        "../assets/projects/generic.png"
+        "assets/projects/generic.png",
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
       ]
     }
   }
