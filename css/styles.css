@@ -586,6 +586,12 @@ button {
   color: var(--muted);
 }
 
+.project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .project-title {
   font-size: 1rem;
   font-weight: 500;
@@ -593,6 +599,27 @@ button {
   line-height: 1.1;
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+.card-demo-link {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--project-accent, var(--muted));
+  border: 1px solid var(--project-accent, var(--line));
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-decoration: none;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.card-demo-link:active {
+  background: var(--project-accent, var(--muted));
+  color: var(--bg);
 }
 
 .project-tagline {
@@ -821,6 +848,14 @@ button {
   width: 14px;
   height: 14px;
   fill: currentColor;
+}
+
+.modal-link-demo svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .modal-close {
@@ -1268,6 +1303,11 @@ button {
 
   .scroll-cue:hover {
     color: var(--ink);
+  }
+
+  .card-demo-link:hover {
+    background: var(--project-accent, var(--muted));
+    color: var(--bg);
   }
 
   .project-card:hover,

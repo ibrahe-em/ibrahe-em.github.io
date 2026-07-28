@@ -6,6 +6,7 @@
     "tagline": "Your inbox, understood",
     "description": "An AI-powered email intelligence platform that extracts tasks, meetings, orders and useful information from emails while preparing replies for the user to review.",
     "url": "https://github.com/maybethemuhammadibrahim/MailMind",
+    "deployed_url": "https://maybethemuhammadibrahim.github.io/MailMind-Demo/",
     "year": "2026",
     "accent": "#D4922A",
     "mark": "M",
@@ -28,9 +29,9 @@
         { "name": "PostgreSQL", "icon": "postgresql" }
       ],
       "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
+        "assets/projects/mailmind/01.webp",
+        "assets/projects/mailmind/02.webp",
+        "assets/projects/mailmind/03.webp"
       ]
     }
   },

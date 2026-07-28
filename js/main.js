@@ -116,7 +116,10 @@
         return `
         <li class="project-card${featuredClass}${ongoingClass}" style="--project-accent:${p.accent}; --card-i:${i};" data-project-id="${p.id}">
           <div class="project-link" role="button" tabindex="0" aria-label="View ${p.title} details">
-            <h3 class="project-title">${p.title}</h3>
+            <div class="project-title-row">
+              <h3 class="project-title">${p.title}</h3>
+              ${p.deployed_url ? `<a class="card-demo-link" href="${p.deployed_url}" target="_blank" rel="noopener noreferrer" aria-label="Live demo" title="Live demo">Live <span aria-hidden="true">↗</span></a>` : ''}
+            </div>
             <p class="project-tagline">${p.tagline}</p>
             <p class="project-desc">${p.description}</p>
             
@@ -134,9 +137,16 @@
       const link = card.querySelector(".project-link");
       if (!link) return;
 
+      // Don't let demo link clicks open the modal
+      card.querySelectorAll(".card-demo-link").forEach((link) => {
+        link.addEventListener("click", (e) => e.stopPropagation());
+      });
+
       function openCard(e) {
         // Don't open modal for ongoing projects
         if (card.classList.contains("ongoing")) return;
+        // Don't open modal when clicking demo link
+        if (e.target.closest(".card-demo-link")) return;
         e.preventDefault();
         const id = card.dataset.projectId;
         const project = allProjects.find((p) => p.id === id);
@@ -197,6 +207,11 @@
           <p class="modal-tagline">${project.tagline}</p>
         </div>
         <div class="modal-header-actions">
+          ${project.deployed_url ? `
+          <a class="modal-link modal-link-demo" href="${project.deployed_url}" target="_blank" rel="noopener noreferrer" aria-label="View live demo">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+            <span>Demo</span>
+          </a>` : ''}
           <a class="modal-link" href="${project.url}" target="_blank" rel="noopener noreferrer" aria-label="View on GitHub">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.81.5 12.38c0 5.26 3.39 9.72 8.09 11.29.59.11.81-.26.81-.58v-2.02c-3.29.74-3.98-1.39-3.98-1.39-.54-1.42-1.32-1.8-1.32-1.8-1.08-.76.08-.75.08-.75 1.2.09 1.83 1.28 1.83 1.28 1.06 1.88 2.77 1.34 3.45 1.03.11-.79.42-1.34.76-1.65-2.63-.31-5.39-1.36-5.39-6.06 0-1.34.46-2.44 1.22-3.3-.12-.31-.53-1.56.12-3.24 0 0 .99-.33 3.24 1.26a11.02 11.02 0 0 1 5.9 0c2.24-1.59 3.23-1.26 3.23-1.26.65 1.68.24 2.93.12 3.24.76.86 1.22 1.96 1.22 3.3 0 4.71-2.77 5.74-5.41 6.05.43.39.81 1.16.81 2.34v3.47c0 .32.22.7.82.58 4.7-1.57 8.08-6.03 8.08-11.29C23.5 5.81 18.35.5 12 .5Z"/></svg>
             <span>GitHub</span>
