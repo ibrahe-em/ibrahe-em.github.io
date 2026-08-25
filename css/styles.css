@@ -315,8 +315,13 @@ button {
   padding: calc(var(--pad) + 10px) var(--pad) var(--pad);
 }
 
+/* The upper bound is not cosmetic. --content-width caps at 1050px (so
+   .name-container stops growing around 1280px viewports) while 7vw and the
+   image's 22vw keep climbing — past ~1650px the name's share of the row is
+   frozen at 602px but "Muhammad" needs more, so it ran into the image. Capping
+   at 6.4rem keeps the longest word inside its share with a real gutter. */
 .intro-name {
-  font-size: clamp(3rem, 7vw, 7.2rem);
+  font-size: clamp(3rem, 7vw, 6.4rem);
   font-weight: 500;
   letter-spacing: -0.03em;
   line-height: 0.94;
