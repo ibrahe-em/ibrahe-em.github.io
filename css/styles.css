@@ -26,6 +26,11 @@
   --accent: #1a1814;
   --accent-soft: #1a181414;
   --overlay-bg: rgba(245, 239, 230, 0.88);
+  --gh-0: #e7e0d4;
+  --gh-1: #d0b177;
+  --gh-2: #bc8f42;
+  --gh-3: #9a6f26;
+  --gh-4: #6f4f14;
 
   --font-sans: 'Rubik', -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -49,6 +54,11 @@
   --accent: #1a1814;
   --accent-soft: #1a181414;
   --overlay-bg: rgba(245, 239, 230, 0.88);
+  --gh-0: #e7e0d4;
+  --gh-1: #d0b177;
+  --gh-2: #bc8f42;
+  --gh-3: #9a6f26;
+  --gh-4: #6f4f14;
   color-scheme: light;
 }
 
@@ -64,6 +74,11 @@
   --accent: #e8e2d9;
   --accent-soft: #e8e2d922;
   --overlay-bg: rgba(20, 18, 16, 0.82);
+  --gh-0: #221e1a;
+  --gh-1: #4a3c24;
+  --gh-2: #7d6533;
+  --gh-3: #b38f45;
+  --gh-4: #e0b45f;
   color-scheme: dark;
 }
 
@@ -80,6 +95,11 @@
     --accent: #e8e2d9;
     --accent-soft: #e8e2d922;
     --overlay-bg: rgba(20, 18, 16, 0.82);
+    --gh-0: #221e1a;
+    --gh-1: #4a3c24;
+    --gh-2: #7d6533;
+    --gh-3: #b38f45;
+    --gh-4: #e0b45f;
     color-scheme: dark;
   }
 }
@@ -474,6 +494,177 @@ button {
   flex-wrap: wrap;
 }
 
+/* ---------- work tabs ---------- */
+
+/* renderTabs() leaves this empty when the data holds only one kind of project,
+   so the whole control disappears rather than sitting there as a lone tab. */
+.work-tabs:empty {
+  display: none;
+}
+
+/* The heading's 44px breathing room is meant to sit against the grid. With a
+   tab row in between, that much air orphans the tabs from their heading. */
+.work-head:has(+ .work-tabs:not(:empty)) {
+  margin-bottom: 18px;
+}
+
+.work-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;                      /* keeps hit areas well clear of the 8px floor */
+  margin: 0 0 26px;
+  padding: 0 var(--pad);
+  position: relative;
+  flex-wrap: wrap;
+}
+
+/* Hairline the active marker rides on, inset to the content gutter. */
+.work-tabs::after {
+  content: "";
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: 0;
+  height: 1px;
+  background: var(--line);
+}
+
+.work-tab {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;               /* touch target floor */
+  padding: 10px 2px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  /* --faint measures 2.54:1 on the light paper, so it is not usable for a
+     control's own label; --muted clears 4.5:1 in both themes. */
+  color: var(--muted);
+  transition: color 0.2s var(--ease);
+}
+
+.work-tab[aria-pressed="true"] {
+  color: var(--ink);
+}
+
+/* One shared marker that travels between tabs instead of a per-tab underline
+   that blinks out here and in over there.
+
+   It is a 1px-wide bar driven purely by transform: translateX positions it and
+   scaleX stretches it to the active tab's width. Animating transform keeps the
+   whole move on the compositor -- animating left/width instead would put a
+   layout + paint on the main thread for every frame of the slide. */
+.work-tabs-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* The container's ::after hairline is the last box in paint order, so the
+     marker needs to be lifted above it explicitly. */
+  z-index: 2;
+  width: 1px;
+  height: 1px;
+  background: var(--ink);
+  transform-origin: left center;
+  transform: translateX(var(--ind-x, 0px)) scaleX(var(--ind-w, 0));
+  view-transition-name: work-tab-indicator;
+  pointer-events: none;
+}
+
+/* Deliberately no transition here by default. Where view transitions exist the
+   group morph below slides the marker, and a CSS transition running at the same
+   time would still be mid-flight when the browser snapshots the new state —
+   the marker would be captured at its old position and appear not to move.
+   Only browsers without the API need to animate it themselves. */
+@supports not (view-transition-name: none) {
+  .work-tabs-indicator {
+    transition: transform 0.26s var(--ease);
+  }
+
+  /* First paint should not slide in from the left edge. */
+  .work-tabs-indicator.is-initial {
+    transition: none;
+  }
+}
+
+/* A solid 1px bar has nothing to cross-fade, so suppressing the default fade
+   leaves a clean slide driven only by the group's transform. */
+::view-transition-old(work-tab-indicator),
+::view-transition-new(work-tab-indicator) {
+  animation: none;
+}
+
+.work-tab-count {
+  font-size: 0.92em;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.work-tab[aria-pressed="true"] .work-tab-count {
+  color: var(--muted);
+}
+
+/* Filtered-out cards leave the grid entirely so auto-fit reflows the columns. */
+.project-card.is-hidden {
+  display: none;
+}
+
+/* ---------- tab switch choreography ----------
+
+   The filter runs inside document.startViewTransition(), so the browser
+   snapshots every named element before and after the class toggle and tweens
+   between the two on the compositor. Nothing here runs per-frame JavaScript,
+   and no card is ever measured or positioned by hand.
+
+   Cards that survive a filter are morphed from their old grid slot to their new
+   one automatically; only the ones entering and leaving need describing. */
+
+::view-transition-group(*) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--ease);
+}
+
+/* Nothing outside the grid changes on a tab switch, so paying for a
+   full-viewport crossfade would be waste. Named elements still animate. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+@keyframes card-leave {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+/* :only-child is what separates the two cases. A card present in both states
+   has an old AND a new image in its group, so neither is an only child and the
+   group's own transform morph carries it to its new grid slot untouched. A card
+   that is only leaving (or only arriving) has a group of one — that is the one
+   to fade. Without this guard every surviving card also shrinks 3% mid-move. */
+::view-transition-old(.project-card-snapshot):only-child {
+  animation: card-leave 180ms var(--ease) forwards;
+}
+
+::view-transition-new(.project-card-snapshot):only-child {
+  /* Enters a touch slower than it leaves, so the incoming set settles last. */
+  animation: card-enter 240ms var(--ease) backwards;
+}
+
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(var(--project-card-min), 1fr));
@@ -484,6 +675,10 @@ button {
 /* ---------- project cards ---------- */
 
 .project-card {
+  /* Each card carries a unique view-transition-name (set at render time); this
+     shared class is what the ::view-transition-* rules below select on, so the
+     enter/leave choreography is written once rather than per card. */
+  view-transition-class: project-card-snapshot;
   min-width: 0;
   position: relative;
   border: 1px solid var(--line);
@@ -1256,6 +1451,107 @@ button {
   }
 }
 
+/* ---------- github contributions ---------- */
+
+/* The section ships hidden and is only revealed once real data has rendered,
+   so a dead upstream leaves no trace rather than an empty frame or an error. */
+.contrib[hidden] {
+  display: none;
+}
+
+.contrib {
+  padding: 0 0 72px;
+}
+
+.contrib-head {
+  padding: 0 var(--pad);
+  margin: 0 0 22px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.contrib-heading {
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+}
+
+.contrib-heading em {
+  font-style: normal;
+  color: var(--muted);
+}
+
+.contrib-total {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+
+.contrib-chart {
+  padding: 0 var(--pad);
+}
+
+/* One SVG rather than ~370 divs: the layout engine places a single box, and
+   the cells cost nothing but paint. Sized in px by the renderer so the squares
+   stay crisp instead of being scaled to fractional sizes. */
+.contrib-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.contrib-cell {
+  /* Painted with a hairline of the page ground so adjacent squares never merge
+     into a block at the darker end of the ramp. */
+  stroke: var(--bg);
+  stroke-width: 1px;
+  rx: 2px;
+}
+
+.contrib-axis {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  fill: var(--muted);
+}
+
+.contrib-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.contrib-legend-swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+}
+
+@media (max-width: 640px) {
+  .contrib {
+    padding-bottom: 52px;
+  }
+
+  .contrib-legend {
+    font-size: 0.66rem;
+  }
+}
+
 /* ---------- konami easter egg ---------- */
 
 @keyframes wobble {
@@ -1292,6 +1588,10 @@ button {
    bugs on a phone. Press feedback lives in :active rules above. */
 
 @media (hover: hover) and (pointer: fine) {
+  .work-tab:hover {
+    color: var(--ink);
+  }
+
   .theme-toggle:hover {
     transform: scale(1.12);
   }
@@ -1428,8 +1728,15 @@ button {
      floor. Nudge the smallest labels back up. */
   .project-top,
   .project-tags li,
-  .bento-label {
+  .bento-label,
+  .work-tab {
     font-size: 0.72rem;
+  }
+
+  /* Bigger type needs a tighter gutter to keep three tabs on one line at 320px. */
+  .work-tabs {
+    gap: 18px;
+    margin-bottom: 22px;
   }
 
   .album-hint,

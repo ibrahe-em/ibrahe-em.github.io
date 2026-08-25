@@ -11,6 +11,7 @@
     "accent": "#D4922A",
     "mark": "M",
     "featured": false,
+    "kind": "personal",
     "tags": [
       "Python",
       "React",
@@ -46,6 +47,7 @@
     "accent": "#E84B1A",
     "mark": "F+",
     "featured": true,
+    "kind": "personal",
     "tags": [
       "JavaScript",
       "HTML",
@@ -80,6 +82,7 @@
     "accent": "#617A69",
     "mark": "S",
     "featured": false,
+    "kind": "personal",
     "tags": [
       "Python",
       "Machine Learning",
@@ -114,6 +117,7 @@
     "accent": "#5E6AD2",
     "mark": "L",
     "featured": false,
+    "kind": "personal",
     "tags": [
       "SaaS",
       "Automation",
@@ -132,6 +136,74 @@
       ],
       "screenshots": [
         "assets/projects/generic.png",
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
+      ]
+    }
+  },
+  {
+    "id": "client-sample-one",
+    "index": "📦",
+    "title": "Lorem Retail",
+    "tagline": "Ipsum dolor sit amet",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "url": "",
+    "deployed_url": "",
+    "year": "2026",
+    "accent": "#2F7D6E",
+    "mark": "LR",
+    "featured": false,
+    "kind": "client",
+    "tags": [
+      "Next.js",
+      "TypeScript",
+      "Stripe",
+      "Postgres"
+    ],
+    "detail": {
+      "problem": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
+      "solution": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "stack": [
+        { "name": "Next.js", "icon": "nextjs" },
+        { "name": "TypeScript", "icon": "typescript" },
+        { "name": "Stripe", "icon": "stripe" },
+        { "name": "PostgreSQL", "icon": "postgresql" }
+      ],
+      "screenshots": [
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
+      ]
+    }
+  },
+  {
+    "id": "client-sample-two",
+    "index": "📊",
+    "title": "Consectetur Labs",
+    "tagline": "Adipiscing elit sed do",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "url": "",
+    "deployed_url": "",
+    "year": "2026",
+    "accent": "#6A4FB6",
+    "mark": "CL",
+    "featured": false,
+    "kind": "client",
+    "tags": [
+      "Python",
+      "FastAPI",
+      "React",
+      "Docker"
+    ],
+    "detail": {
+      "problem": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
+      "solution": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "stack": [
+        { "name": "Python", "icon": "python" },
+        { "name": "FastAPI", "icon": "fastapi" },
+        { "name": "React", "icon": "react" },
+        { "name": "Docker", "icon": "docker" }
+      ],
+      "screenshots": [
         "assets/projects/generic.png",
         "assets/projects/generic.png"
       ]

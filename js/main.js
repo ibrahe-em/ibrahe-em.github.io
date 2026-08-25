@@ -64,6 +64,7 @@
       const normalized = normalizeProjectData(data);
       renderSectionHeading(normalized.projectsSection, "#workIndex", "#workHeading");
       renderProjects(normalized.projects);
+      renderTabs(normalized.projects);
       observeCards();
     })
     .catch((err) => {
@@ -114,7 +115,7 @@
         const featuredClass = p.featured ? " featured" : "";
         const ongoingClass = p.ongoing ? " ongoing" : "";
         return `
-        <li class="project-card${featuredClass}${ongoingClass}" style="--project-accent:${p.accent}; --card-i:${i};" data-project-id="${p.id}">
+        <li class="project-card${featuredClass}${ongoingClass}" style="--project-accent:${p.accent}; --card-i:${i}; view-transition-name:card-${p.id};" data-project-id="${p.id}" data-kind="${kindOf(p)}">
           <div class="project-link" role="button" tabindex="0" aria-label="View ${p.title} details">
             <div class="project-title-row">
               <h3 class="project-title">${p.title}</h3>
@@ -161,6 +162,265 @@
         }
       });
     });
+  }
+
+  /* ---------- work tabs ---------- */
+
+  /* Display order and labels. A kind absent from the data never gets a tab, so
+     this list can name buckets before any project uses them. */
+  const KIND_TABS = [
+    { id: "personal", label: "Personal" },
+    { id: "client", label: "Client" },
+  ];
+  const DEFAULT_KIND = "personal";
+  const ALL = "all";
+  const TAB_PARAM = "tab";
+
+  // Older entries predate the field; treating a missing kind as personal means
+  // the data file never has to be backfilled for the filter to work.
+  function kindOf(project) {
+    return project.kind || DEFAULT_KIND;
+  }
+
+  function renderTabs(projects) {
+    const bar = $("#workTabs");
+    if (!bar) return;
+
+    const counts = projects.reduce((acc, p) => {
+      const k = kindOf(p);
+      acc[k] = (acc[k] || 0) + 1;
+      return acc;
+    }, {});
+
+    const present = KIND_TABS.filter((t) => counts[t.id]);
+
+    // One bucket is not a choice — leaving the bar empty hides it via :empty.
+    if (present.length < 2) {
+      bar.innerHTML = "";
+      return;
+    }
+
+    const tabs = [{ id: ALL, label: "All", count: projects.length }].concat(
+      present.map((t) => ({ id: t.id, label: t.label, count: counts[t.id] }))
+    );
+
+    bar.innerHTML = tabs
+      .map(
+        (t) => `
+        <button type="button" class="work-tab" data-kind="${t.id}" aria-pressed="false">
+          ${t.label}<span class="work-tab-count" aria-hidden="true">${String(t.count).padStart(2, "0")}</span>
+        </button>`
+      )
+      .join("");
+
+    const indicator = document.createElement("span");
+    indicator.className = "work-tabs-indicator is-initial";
+    indicator.setAttribute("aria-hidden", "true");
+    bar.appendChild(indicator);
+
+    bar.querySelectorAll(".work-tab").forEach((btn) => {
+      btn.addEventListener("click", () => applyFilter(btn.dataset.kind, true));
+    });
+
+    const requested = new URL(window.location.href).searchParams.get(TAB_PARAM);
+    const initial = tabs.some((t) => t.id === requested) ? requested : ALL;
+    // Page load has no previous state to morph from, and routing it through a
+    // transition would defer the marker's first placement into a callback.
+    applyFilter(initial, false, false);
+
+    // Drop the suppressor only once the browser has painted the marker where it
+    // belongs, otherwise it visibly slides in from the left on first load.
+    requestAnimationFrame(() => indicator.classList.remove("is-initial"));
+
+    // The marker is positioned in pixels, so a resize invalidates it. Measuring
+    // is cheap, but doing it on every resize event is not.
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(moveIndicator, 120);
+    });
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  /* Reads two layout properties and writes two custom properties — no per-frame
+     JavaScript. The move itself is a transform, so it stays on the compositor. */
+  function moveIndicator() {
+    const bar = $("#workTabs");
+    const indicator = bar && bar.querySelector(".work-tabs-indicator");
+    const active = bar && bar.querySelector('.work-tab[aria-pressed="true"]');
+    if (!indicator || !active) return;
+    indicator.style.setProperty("--ind-x", `${active.offsetLeft}px`);
+    indicator.style.setProperty("--ind-w", String(active.offsetWidth));
+  }
+
+  function applyFilter(kind, updateUrl, animate = true) {
+    const commit = () => {
+      document.querySelectorAll("#workTabs .work-tab").forEach((btn) => {
+        btn.setAttribute("aria-pressed", String(btn.dataset.kind === kind));
+      });
+
+      // Toggling a class rather than re-rendering keeps every card's click and
+      // keyboard handler attached — a re-render would have to rebind them all.
+      document.querySelectorAll("#projectList .project-card").forEach((card) => {
+        const show = kind === ALL || card.dataset.kind === kind;
+        card.classList.toggle("is-hidden", !show);
+      });
+
+      moveIndicator();
+    };
+
+    // View transitions let the browser tween the two layouts itself, on the
+    // compositor. Where the API is missing the swap is simply instant, and
+    // reduced-motion opts out on purpose rather than by accident.
+    if (animate && document.startViewTransition && !prefersReducedMotion()) {
+      document.startViewTransition(commit);
+    } else {
+      commit();
+    }
+
+    if (!updateUrl) return;
+    // replaceState, not pushState: the address bar stays shareable without
+    // turning every tab click into a browser-back step.
+    const url = new URL(window.location.href);
+    if (kind === ALL) url.searchParams.delete(TAB_PARAM);
+    else url.searchParams.set(TAB_PARAM, kind);
+    window.history.replaceState(null, "", url);
+  }
+
+  /* ---------- github contributions ---------- */
+
+  /* Path B: read straight from a CORS-enabled proxy at page load. GitHub's own
+     /users/<name>/contributions fragment carries no Access-Control-Allow-Origin
+     header, so the browser cannot read it directly and this stands in for it.
+     The site repo lives under a different account than the contributions do —
+     this name is deliberate, not derivable from the repo. */
+  const GH_USER = "maybethemuhammadibrahim";
+  const GH_API = `https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`;
+
+  const CELL = 11;          // square edge
+  const GAP = 3;
+  const STEP = CELL + GAP;
+  const DAY_LABEL_W = 26;   // gutter for Mon/Wed/Fri
+  const MONTH_LABEL_H = 14;
+  const MIN_WEEKS = 12;
+  const MAX_WEEKS = 53;
+
+  const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  let contribDays = null;   // flat, chronological, from the API
+  let contribWeeksShown = 0;
+
+  function initContributions() {
+    fetch(GH_API)
+      .then((res) => {
+        if (!res.ok) throw new Error(`contributions API ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        const days = (data && data.contributions) || [];
+        // A well-formed but empty year is still nothing worth drawing.
+        if (!days.length || !days.some((d) => d.count > 0)) return;
+        contribDays = days;
+        // Reveal before rendering: a hidden section is display:none, so its
+        // clientWidth reads 0 and every width would collapse to the floor.
+        $("#contrib").hidden = false;
+        renderContributions();
+
+        let timer;
+        window.addEventListener("resize", () => {
+          clearTimeout(timer);
+          timer = setTimeout(renderContributions, 150);
+        });
+      })
+      .catch(() => {
+        /* Deliberately silent. The section was authored hidden, so a dead or
+           rate-limited upstream simply leaves the page as if it never existed
+           rather than showing a broken frame. */
+      });
+  }
+
+  /* How many weeks fit at this width. Rather than scaling the squares down to
+     an unreadable size on a phone, the window shortens and the cells stay 11px. */
+  function weeksThatFit(containerWidth) {
+    const usable = containerWidth - DAY_LABEL_W;
+    const fits = Math.floor((usable + GAP) / STEP);
+    return Math.max(MIN_WEEKS, Math.min(MAX_WEEKS, fits));
+  }
+
+  function renderContributions() {
+    const host = $("#contribChart");
+    if (!host || !contribDays) return;
+
+    // clientWidth counts the element's own horizontal padding, which here is a
+    // full --pad gutter each side. Budgeting against it would size the grid to
+    // the padding box and let max-width squeeze the squares below 11px.
+    const cs = window.getComputedStyle(host);
+    const usable = host.clientWidth
+      - parseFloat(cs.paddingLeft || 0)
+      - parseFloat(cs.paddingRight || 0);
+    const weeks = weeksThatFit(usable);
+    // Re-rendering identical output on every resize tick is pure waste.
+    if (weeks === contribWeeksShown && host.querySelector(".contrib-svg")) return;
+    contribWeeksShown = weeks;
+
+    // The API returns whole weeks starting on a Sunday; trim from the left so
+    // the grid keeps its day-of-week rows and the most recent week stays last.
+    const cols = [];
+    for (let i = 0; i < contribDays.length; i += 7) {
+      cols.push(contribDays.slice(i, i + 7));
+    }
+    const shown = cols.slice(-weeks);
+
+    const w = DAY_LABEL_W + shown.length * STEP - GAP;
+    const h = MONTH_LABEL_H + 7 * STEP - GAP;
+
+    let cells = "";
+    let months = "";
+    let lastMonth = -1;
+
+    shown.forEach((col, x) => {
+      const cx = DAY_LABEL_W + x * STEP;
+      col.forEach((day, y) => {
+        const d = new Date(day.date + "T00:00:00");
+        // Label a month the first time one of its columns appears, but not in
+        // the final column where the text would overhang the chart.
+        if (y === 0 && d.getMonth() !== lastMonth && x < shown.length - 2) {
+          lastMonth = d.getMonth();
+          months += `<text class="contrib-axis" x="${cx}" y="9">${MONTH_NAMES[d.getMonth()]}</text>`;
+        }
+        const label = `${day.count === 0 ? "No" : day.count} contribution${day.count === 1 ? "" : "s"} on ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+        cells += `<rect class="contrib-cell" x="${cx}" y="${MONTH_LABEL_H + y * STEP}" ` +
+                 `width="${CELL}" height="${CELL}" fill="var(--gh-${day.level})">` +
+                 `<title>${label}</title></rect>`;
+      });
+    });
+
+    // Mon/Wed/Fri only — labelling all seven crowds the gutter, and these three
+    // are enough to orient the rows.
+    let dayLabels = "";
+    [1, 3, 5].forEach((y) => {
+      dayLabels += `<text class="contrib-axis" x="0" y="${MONTH_LABEL_H + y * STEP + CELL - 2}">${DAY_NAMES[y]}</text>`;
+    });
+
+    const total = contribDays.reduce((n, d) => n + d.count, 0);
+    const summary = `${total} GitHub contributions in the last year`;
+
+    host.innerHTML =
+      `<svg class="contrib-svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" ` +
+      `role="img" aria-label="${summary}">${months}${dayLabels}${cells}</svg>` +
+      `<p class="contrib-legend"><span>Less</span>` +
+      [0, 1, 2, 3, 4].map((l) =>
+        `<span class="contrib-legend-swatch" style="background:var(--gh-${l})"></span>`
+      ).join("") +
+      `<span>More</span></p>`;
+
+    const totalEl = $("#contribTotal");
+    if (totalEl) totalEl.textContent = `${total} contributions · last 12 months`;
   }
 
   /* ---------- modal system ---------- */
@@ -567,6 +827,10 @@
   });
 
   updatePageProgress();
+
+  // Kicked off on its own rather than chained to the projects fetch, so neither
+  // section can take the other down.
+  initContributions();
 
   /* ---------- footer live clock (PKT) ---------- */
 

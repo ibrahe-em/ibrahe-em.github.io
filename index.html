@@ -7,6 +7,7 @@
   <meta name="theme-color" content="#f5efe6">
   <script defer src="https://cloud.umami.is/script.js" data-website-id="b1aa67d8-9e79-49fa-85b9-ea044a4e2b11"></script>
   <title>Muhammad Ibrahim</title>
+  <link rel="icon" type="image/png" href="assets/ibrahim_favicon.png">
   <link rel="preload" href="assets/fonts/Rubik-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/styles.css">
   <script>
@@ -68,9 +69,23 @@
         </div>
       </div>
 
+      <!-- Populated by renderTabs(); stays empty (and invisible) until the data
+           holds more than one kind of project. -->
+      <div class="work-tabs" id="workTabs" role="group" aria-label="Filter projects by type"></div>
+
       <ul class="projects-grid" id="projectList" aria-live="polite">
         <li class="noscript-note">Loading projects...</li>
       </ul>
+    </section>
+
+    <!-- Filled by renderContributions(). Stays empty — and hidden via :empty —
+         whenever the upstream API is unreachable or returns nothing usable. -->
+    <section class="contrib" id="contrib" hidden aria-labelledby="contribHeading">
+      <div class="contrib-head">
+        <h2 class="contrib-heading" id="contribHeading">Lately I have <em>committed.</em></h2>
+        <p class="contrib-total" id="contribTotal"></p>
+      </div>
+      <div class="contrib-chart" id="contribChart"></div>
     </section>
   </main>
 

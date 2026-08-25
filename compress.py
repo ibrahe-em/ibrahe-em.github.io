@@ -300,6 +300,8 @@ def stub_project(project_id, title):
         "accent": "#5E6AD2",
         "mark": title[:1].upper(),
         "featured": False,
+        # Matches the site's default for a missing kind; flip to "client" by hand.
+        "kind": "personal",
         "tags": [],
         "detail": {"problem": "", "solution": "", "stack": [], "screenshots": []},
     }
