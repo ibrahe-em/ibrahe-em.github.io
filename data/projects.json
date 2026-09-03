@@ -3,8 +3,8 @@
     "id": "mailmind",
     "index": "📧",
     "title": "MailMind",
-    "tagline": "Your inbox, understood",
-    "description": "An AI-powered email intelligence platform that extracts tasks, meetings, orders and useful information from emails while preparing replies for the user to review.",
+    "tagline": "Your inbox, turned into a to-do list",
+    "description": "An AI email assistant I built to turn a busy inbox into useful, structured information. It identifies tasks, meetings, orders, and other important details from emails, then prepares replies and organizes everything in one place.",
     "url": "https://github.com/maybethemuhammadibrahim/MailMind",
     "deployed_url": "https://maybethemuhammadibrahim.github.io/MailMind-Demo/",
     "year": "2026",
@@ -19,8 +19,8 @@
       "Gmail API"
     ],
     "detail": {
-      "problem": "Modern inboxes are noisy. Important tasks get buried under promotions and threads, meetings get missed, and useful information — like order confirmations or travel itineraries — is scattered across hundreds of emails with no easy way to surface it.",
-      "solution": "MailMind connects to your Gmail, reads incoming emails using NLP, and automatically classifies them into actionable categories: tasks, meetings, orders, and general info. It extracts structured data from each, prepares draft replies for review, and presents everything in a clean dashboard — turning email chaos into organized intelligence.",
+      "problem": "Important information is often buried inside an inbox. A simple email can contain a task, a meeting, an order, or something that needs a reply, but keeping track of all of it manually takes time.",
+      "solution": "I built MailMind as an intelligent layer on top of Gmail. It reads incoming emails, identifies what matters, extracts the useful information, turns it into structured items, and can prepare replies for the user to review. The project was later paused as Gmail began offering many of these capabilities itself, but it gave me hands-on experience building an AI product around real-world email workflows.",
       "stack": [
         { "name": "Python", "icon": "python" },
         { "name": "React", "icon": "react" },
@@ -41,7 +41,7 @@
     "index": "🧩",
     "title": "FlexPlus",
     "tagline": "A better university portal",
-    "description": "A browser extension that redesigns the FAST NUCES student portal into a calmer, clearer and more useful experience.",
+    "description": "I built a browser extension that completely overhauls the FAST student portal without requiring any changes to the university's system. It replaces the cluttered interface with a cleaner experience and adds features like a prerequisite checker, SGPA/CGPA simulator, and total-fee calculator.",
     "url": "https://github.com/maybethemuhammadibrahim/flexplus",
     "year": "2026",
     "accent": "#E84B1A",
@@ -55,8 +55,8 @@
       "Browser APIs"
     ],
     "detail": {
-      "problem": "The FAST NUCES student portal (FlexStudent) has a cluttered, confusing interface. Students struggle to find grades, schedules, and fee information buried under layers of poor navigation, inconsistent styling, and unnecessary complexity.",
-      "solution": "FlexPlus is a browser extension that injects cleaner CSS and restructured layouts directly into the existing portal. It reorganizes navigation, simplifies the grade view, adds a proper timetable display, and strips away visual clutter — all without needing access to the backend or any data leaving the browser.",
+      "problem": "The original student portal was difficult to navigate and often displayed important information in a confusing way. Students had to work around the interface just to do simple things like check grades, plan courses, or understand their fees.",
+      "solution": "I built FlexPlus to work on top of the existing portal. Once the original page loads, the extension reconstructs the interface into a cleaner layout and adds tools that weren't available in the original system. It required no access to the university's backend and was built independently, eventually reaching around 1,000 users.",
       "stack": [
         { "name": "JavaScript", "icon": "javascript" },
         { "name": "HTML", "icon": "html" },
@@ -75,8 +75,8 @@
     "id": "sepsis-analysis",
     "index": "🩺",
     "title": "Sepsis Analysis",
-    "tagline": "Earlier warning from ICU data",
-    "description": "A machine-learning pipeline designed to identify patients at risk of sepsis using irregular and highly incomplete ICU time-series data.",
+    "tagline": "Finding warning signs earlier",
+    "description": "I built a machine-learning pipeline that analyzes incomplete ICU patient data to identify patterns associated with sepsis before clinical onset. The project focuses on making sense of the messy, irregular data that real-world patient monitoring produces.",
     "url": "https://github.com/maybethemuhammadibrahim/sepsis-analysis",
     "year": "2026",
     "accent": "#617A69",
@@ -90,8 +90,8 @@
       "Healthcare"
     ],
     "detail": {
-      "problem": "Sepsis is a leading cause of death in ICUs, but early detection is extremely difficult. Patient vital signs are recorded irregularly, with large gaps and missing values, making it hard for traditional models to learn reliable patterns from the data.",
-      "solution": "This pipeline handles irregular, incomplete ICU time-series data through careful imputation, feature engineering, and temporal modeling. It uses gradient-boosted trees with hand-crafted statistical features (rolling means, deltas, missing-data indicators) to flag at-risk patients hours before clinical onset — giving doctors a crucial early warning window.",
+      "problem": "ICU data isn't recorded neatly. Vital signs and other measurements can have large gaps, arrive at irregular intervals, and contain missing information, making it difficult to build reliable models for early detection.",
+      "solution": "I built a pipeline that cleans and fills gaps in the data, creates useful time-based features, and looks for changes in a patient's condition over time. The resulting model uses these patterns to flag patients who may be approaching sepsis, turning incomplete ICU records into an early-warning signal.",
       "stack": [
         { "name": "Python", "icon": "python" },
         { "name": "scikit-learn", "icon": "scikitlearn" },
@@ -110,8 +110,8 @@
     "id": "lookbook-cropper",
     "index": "🖼️",
     "title": "Lookbook Cropper",
-    "tagline": "Automated product extraction from PDFs",
-    "description": "An MVP SaaS platform that automates the tedious task of extracting individual product photos from multi-page brand lookbooks, featuring asynchronous background processing and an interactive cropping UI.",
+    "tagline": "A smarter media workflow for e-commerce",
+    "description": "I'm building a media management platform for e-commerce teams to organize their product assets and create marketing content from them. The platform combines product media management with AI-powered tools for generating ads and other content relevant to a brand's style.",
     "url": "https://github.com/maybethemuhammadibrahim/lookbook-cropper",
     "year": "2026",
     "accent": "#5E6AD2",
@@ -125,8 +125,8 @@
       "SQLite"
     ],
     "detail": {
-      "problem": "Fashion brands distribute product catalogs as multi-page PDF lookbooks. Extracting individual product images from these PDFs is a tedious manual process — designers and e-commerce teams spend hours cropping, aligning, and exporting each product photo one by one.",
-      "solution": "Lookbook Cropper lets users upload a PDF, automatically detects product boundaries on each page, and extracts individual product images. Users can fine-tune crops through an interactive UI before downloading. Processing happens asynchronously in the background, so users can queue multiple lookbooks without waiting.",
+      "problem": "E-commerce teams often have product images, lookbooks, marketing assets, and other media scattered across different files and folders. Turning those assets into properly organized product media and marketing material can involve a lot of repetitive manual work.",
+      "solution": "I'm building a platform that brings the entire media workflow into one place. It can process product lookbooks, help extract and organize product imagery, manage media assets, and use AI to generate advertising material based on the products and the brand's visual style. The platform is currently under development.",
       "stack": [
         { "name": "Python", "icon": "python" },
         { "name": "Flask", "icon": "flask" },
@@ -142,32 +142,32 @@
     }
   },
   {
-    "id": "client-sample-one",
-    "index": "📦",
-    "title": "Lorem Retail",
-    "tagline": "Ipsum dolor sit amet",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "url": "",
-    "deployed_url": "",
+    "id": "true-momentum",
+    "index": "📈",
+    "title": "True Momentum",
+    "tagline": "Turning an AI pipeline into a real product",
+    "description": "I built the full-stack web application around an existing AI revenue-diagnostic pipeline. I designed and developed the user-facing experience, diagnostic flow, backend, payments, and supporting product infrastructure needed to turn the underlying system into something customers could actually use.",
+    "url": "https://true-momentum.vercel.app/",
+    "deployed_url": "https://true-momentum.vercel.app/",
     "year": "2026",
     "accent": "#2F7D6E",
-    "mark": "LR",
+    "mark": "TM",
     "featured": false,
     "kind": "client",
     "tags": [
-      "Next.js",
-      "TypeScript",
-      "Stripe",
-      "Postgres"
+      "Full Stack",
+      "React",
+      "Node.js",
+      "AI"
     ],
     "detail": {
-      "problem": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
-      "solution": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "problem": "The client already had the core AI analysis pipeline, but needed a proper product around it. The challenge was turning that underlying technology into a clear, trustworthy experience that could take a user from the initial assessment through to the final service.",
+      "solution": "I built the web application around the existing pipeline, including the landing pages, diagnostic experience, user flows, backend functionality, and payment integration. Rather than simply presenting the AI as a technical demo, I turned it into a complete customer-facing product designed around how someone would actually use the service.",
       "stack": [
-        { "name": "Next.js", "icon": "nextjs" },
-        { "name": "TypeScript", "icon": "typescript" },
-        { "name": "Stripe", "icon": "stripe" },
-        { "name": "PostgreSQL", "icon": "postgresql" }
+        { "name": "React", "icon": "react" },
+        { "name": "Node.js", "icon": "nodejs" },
+        { "name": "Full Stack", "icon": "fullstack" },
+        { "name": "AI", "icon": "openai" }
       ],
       "screenshots": [
         "assets/projects/generic.png",
@@ -176,32 +176,66 @@
     }
   },
   {
-    "id": "client-sample-two",
-    "index": "📊",
-    "title": "Consectetur Labs",
-    "tagline": "Adipiscing elit sed do",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    "url": "",
-    "deployed_url": "",
+    "id": "auspec-pharma",
+    "index": "💊",
+    "title": "Auspec Pharma",
+    "tagline": "A complete digital platform for a pharmaceutical company",
+    "description": "I built a full-stack website for Auspec Pharma with a public product and company portfolio, working contact system, and an internal admin portal. The admin system lets the team manage products and vacancies themselves and generate QR codes that link directly to digital product leaflets hosted in the cloud.",
+    "url": "https://auspecpharma.com/",
+    "deployed_url": "https://auspecpharma.com/",
     "year": "2026",
-    "accent": "#6A4FB6",
-    "mark": "CL",
+    "accent": "#617A69",
+    "mark": "AP",
     "featured": false,
     "kind": "client",
     "tags": [
-      "Python",
-      "FastAPI",
+      "Node.js",
       "React",
-      "Docker"
+      "Full Stack",
+      "Cloudflare"
     ],
     "detail": {
-      "problem": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.",
-      "solution": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "problem": "The company needed an initial professional web presence, but also needed more than a static website. Product information, hiring vacancies, and medicine leaflets needed to be managed and updated without having to rebuild the site every time something changed.",
+      "solution": "I built both the public website and the management system behind it. Authorized admins can add and update products, manage hiring vacancies, upload product leaflets, and generate QR codes for those leaflets to be placed on medicine packaging. This gives the company a single system for presenting its products publicly while managing its content internally.",
       "stack": [
-        { "name": "Python", "icon": "python" },
-        { "name": "FastAPI", "icon": "fastapi" },
+        { "name": "Node.js", "icon": "nodejs" },
         { "name": "React", "icon": "react" },
-        { "name": "Docker", "icon": "docker" }
+        { "name": "Cloudflare", "icon": "cloudflare" },
+        { "name": "Full Stack", "icon": "fullstack" }
+      ],
+      "screenshots": [
+        "assets/projects/generic.png",
+        "assets/projects/generic.png"
+      ]
+    }
+  },
+  {
+    "id": "house-of-lawn",
+    "index": "🛍️",
+    "title": "House of Lawn",
+    "tagline": "A complete online store for a fashion retailer",
+    "description": "I customized and built out a Shopify e-commerce store for House of Lawn, organizing roughly 1,000 products into a structured online catalog. I helped model the products, collections, brands, and variants and set up the shopping experience so customers can browse and purchase directly online.",
+    "url": "https://www.houseoflawn.com/",
+    "deployed_url": "https://www.houseoflawn.com/",
+    "year": "2026",
+    "accent": "#6A4FB6",
+    "mark": "HL",
+    "featured": false,
+    "kind": "client",
+    "tags": [
+      "Shopify",
+      "E-commerce",
+      "Product Management",
+      "Online Store"
+    ],
+    "detail": {
+      "problem": "The business needed a properly structured online store capable of handling a large fashion catalog. With hundreds of products and multiple brands and collections, simply putting products online wasn't enough—the store needed a structure that made browsing and shopping straightforward.",
+      "solution": "I customized a Shopify storefront and built out its product structure around the business's catalog. I helped organize the products, collections, brands, variants, images, and pricing, while configuring the store's shopping flow so the business could manage its catalog and customers could browse and purchase products online.",
+      "stack": [
+        { "name": "Shopify", "icon": "shopify" },
+        { "name": "E-commerce", "icon": "shopify" },
+        { "name": "Liquid", "icon": "liquid" },
+        { "name": "Online Store", "icon": "shopify" }
       ],
       "screenshots": [
         "assets/projects/generic.png",
