@@ -26,6 +26,28 @@
   --accent: #1a1814;
   --accent-soft: #1a181414;
   --overlay-bg: rgba(245, 239, 230, 0.88);
+  /* How strongly the hover swirl reads behind a screenshot. Paper needs a
+     lighter touch than a dark card: the same image at full strength turns
+     into a poster on cream and a whisper on near-black. */
+  --swirl-strength: 0.5;
+  /* Patterns are drawn bright, to glow on a dark card. On paper that same
+     ribbon is the paper, so light takes the pattern's hue down below the
+     surface it sits on — the swirl keeps its colour and swaps which side of
+     the background it reads from. */
+  --swirl-tone: brightness(0.4) saturate(1.2);
+  /* Status dot on a live project — the one hue the warm palette lacks. */
+  --live: #4a7c59;
+  /* The View Live button. Declared here and in none of the theme blocks below,
+     so it is the one colour on the page that does not move: the amber the
+     contribution scale already reaches for, dark enough for near-black type
+     and clear of both the paper and the near-black card behind it. */
+  --cta: #cfaf76;
+  --cta-ink: #17130f;
+  /* Segmented control: a recessed track with the selected chip lifted off it.
+     Light inverts the usual direction — the chip is the page's own paper,
+     sitting on a track a shade deeper than it. */
+  --tab-track: #e8e2d8;
+  --tab-chip: #f5efe6;
   --gh-0: #e7e0d4;
   --gh-1: #d0b177;
   --gh-2: #bc8f42;
@@ -36,9 +58,8 @@
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --pad: clamp(20px, 5vw, 64px);
-  --content-max: 1050px;
+  --content-max: 1240px;
   --content-width: min(var(--content-max), calc(100vw - (var(--pad) * 2)));
-  --project-card-min: 240px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -54,6 +75,11 @@
   --accent: #1a1814;
   --accent-soft: #1a181414;
   --overlay-bg: rgba(245, 239, 230, 0.88);
+  --swirl-strength: 0.5;
+  --swirl-tone: brightness(0.4) saturate(1.2);
+  --live: #4a7c59;
+  --tab-track: #e8e2d8;
+  --tab-chip: #f5efe6;
   --gh-0: #e7e0d4;
   --gh-1: #d0b177;
   --gh-2: #bc8f42;
@@ -74,6 +100,11 @@
   --accent: #e8e2d9;
   --accent-soft: #e8e2d922;
   --overlay-bg: rgba(20, 18, 16, 0.82);
+  --swirl-strength: 0.8;
+  --swirl-tone: none;
+  --live: #6fbf8a;
+  --tab-track: #191612;
+  --tab-chip: #2a2622;
   --gh-0: #221e1a;
   --gh-1: #4a3c24;
   --gh-2: #7d6533;
@@ -95,6 +126,11 @@
     --accent: #e8e2d9;
     --accent-soft: #e8e2d922;
     --overlay-bg: rgba(20, 18, 16, 0.82);
+    --swirl-strength: 0.8;
+    --swirl-tone: none;
+    --live: #6fbf8a;
+    --tab-track: #191612;
+    --tab-chip: #2a2622;
     --gh-0: #221e1a;
     --gh-1: #4a3c24;
     --gh-2: #7d6533;
@@ -335,11 +371,11 @@ button {
   padding: calc(var(--pad) + 10px) var(--pad) var(--pad);
 }
 
-/* The upper bound is not cosmetic. --content-width caps at 1050px (so
-   .name-container stops growing around 1280px viewports) while 7vw and the
+/* The upper bound is not cosmetic. --content-width caps at 1240px (so
+   .name-container stops growing around 1370px viewports) while 7vw and the
    image's 22vw keep climbing — past ~1650px the name's share of the row is
-   frozen at 602px but "Muhammad" needs more, so it ran into the image. Capping
-   at 6.4rem keeps the longest word inside its share with a real gutter. */
+   frozen and "Muhammad" needs more, so it ran into the image. Capping at
+   6.4rem keeps the longest word inside its share with a real gutter. */
 .intro-name {
   font-size: clamp(3rem, 7vw, 6.4rem);
   font-weight: 500;
@@ -508,38 +544,39 @@ button {
   margin-bottom: 18px;
 }
 
+/* A segmented control: one track holding the whole set, with the active tab
+   marked by a chip that slides between them. The track hugs its tabs rather
+   than spanning the column, and the gutter moves to the margin so its left
+   edge still lines up with the cards below. */
 .work-tabs {
+  --track-pad: 4px;
   display: flex;
   align-items: stretch;
-  gap: 24px;                      /* keeps hit areas well clear of the 8px floor */
-  margin: 0 0 26px;
-  padding: 0 var(--pad);
+  gap: 2px;
+  width: max-content;
+  margin: 0 var(--pad) 26px;
+  padding: var(--track-pad);
   position: relative;
-  flex-wrap: wrap;
-}
-
-/* Hairline the active marker rides on, inset to the content gutter. */
-.work-tabs::after {
-  content: "";
-  position: absolute;
-  left: var(--pad);
-  right: var(--pad);
-  bottom: 0;
-  height: 1px;
-  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--tab-track);
+  /* Wrapping would break the chip: it is positioned along one axis only. The
+     kinds are a fixed list, so three tabs is the ceiling by construction. */
+  flex-wrap: nowrap;
 }
 
 .work-tab {
   position: relative;
-  z-index: 1;
+  z-index: 1;                     /* above the chip that slides underneath */
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  min-height: 44px;               /* touch target floor */
-  padding: 10px 2px;
+  min-height: 34px;
+  padding: 8px 16px;
   border: none;
+  border-radius: 999px;
   background: none;
   cursor: pointer;
+  white-space: nowrap;
   font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 0.06em;
@@ -550,69 +587,113 @@ button {
   transition: color 0.2s var(--ease);
 }
 
+/* A chip sized for a cursor is under the 44px touch floor, so the control
+   grows where the pointer is a finger rather than everywhere. */
+@media (pointer: coarse) {
+  .work-tab {
+    min-height: 44px;
+  }
+}
+
 .work-tab[aria-pressed="true"] {
   color: var(--ink);
 }
 
-/* One shared marker that travels between tabs instead of a per-tab underline
+/* One shared chip that travels between tabs instead of a per-tab background
    that blinks out here and in over there.
 
-   It is a 1px-wide bar driven purely by transform: translateX positions it and
-   scaleX stretches it to the active tab's width. Animating transform keeps the
-   whole move on the compositor -- animating left/width instead would put a
-   layout + paint on the main thread for every frame of the slide. */
+   translateX places it and --ind-w gives it the active tab's width, both
+   written by moveIndicator(). The width is a real width rather than a scaleX:
+   a scaled box would drag its corner radius and its shadow out of shape with
+   it, which is exactly what a pill cannot afford. The element is absolutely
+   positioned, so resizing it lays out nothing but itself. */
 .work-tabs-indicator {
   position: absolute;
+  /* Inset to the track's padding so the chip covers the tab and no more. */
+  top: var(--track-pad);
+  bottom: var(--track-pad);
   left: 0;
-  bottom: 0;
-  /* The container's ::after hairline is the last box in paint order, so the
-     marker needs to be lifted above it explicitly. */
-  z-index: 2;
-  width: 1px;
-  height: 1px;
-  background: var(--ink);
-  transform-origin: left center;
-  transform: translateX(var(--ind-x, 0px)) scaleX(var(--ind-w, 0));
+  z-index: 0;
+  width: var(--ind-w, 0px);
+  border-radius: 999px;
+  background: var(--tab-chip);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.09);
+  transform: translateX(var(--ind-x, 0px));
+  transition: transform 0.26s var(--ease), width 0.26s var(--ease);
   view-transition-name: work-tab-indicator;
   pointer-events: none;
 }
 
-/* Deliberately no transition here by default. Where view transitions exist the
-   group morph below slides the marker, and a CSS transition running at the same
-   time would still be mid-flight when the browser snapshots the new state —
-   the marker would be captured at its old position and appear not to move.
-   Only browsers without the API need to animate it themselves. */
-@supports not (view-transition-name: none) {
-  .work-tabs-indicator {
-    transition: transform 0.26s var(--ease);
-  }
-
-  /* First paint should not slide in from the left edge. */
-  .work-tabs-indicator.is-initial {
-    transition: none;
-  }
+/* First paint should not slide in from the left edge. */
+.work-tabs-indicator.is-initial {
+  transition: none;
 }
 
-/* A solid 1px bar has nothing to cross-fade, so suppressing the default fade
-   leaves a clean slide driven only by the group's transform. */
+/* The chip animates itself, and hands over to the view transition only while
+   one is actually running — morph() sets this class for exactly that window.
+
+   Both at once is what cannot happen: a CSS transition still mid-flight when
+   the browser snapshots the new state is captured at its old position, so the
+   group morphs from old to old and the chip appears not to move, then jumps
+   when the pseudo tree is torn down. Gating on the class rather than on
+   @supports also covers the case the API is present but the transition is
+   skipped — the chip is then animated by the only mechanism left. */
+.work-tabs.is-morphing .work-tabs-indicator {
+  transition: none;
+}
+
+/* A flat chip has nothing to cross-fade, so suppressing the default fade
+   leaves a clean slide driven only by the group's own morph.
+
+   block-size is the load-bearing line. Snapshots default to `block-size: auto`,
+   which keeps each image's own aspect ratio: stretch a 90px-wide chip and a
+   70px-wide one to the same animating group width and they come out at
+   different heights, so the slide shows two chips of different sizes stacked
+   instead of one. Filling the group box makes them coincide. */
 ::view-transition-old(work-tab-indicator),
 ::view-transition-new(work-tab-indicator) {
   animation: none;
+  block-size: 100%;
+  object-fit: fill;
 }
 
-.work-tab-count {
-  font-size: 0.92em;
-  color: var(--faint);
-  font-variant-numeric: tabular-nums;
-}
-
-.work-tab[aria-pressed="true"] .work-tab-count {
-  color: var(--muted);
-}
-
-/* Filtered-out cards leave the grid entirely so auto-fit reflows the columns. */
-.project-card.is-hidden {
+/* Filtered-out cards leave the grid entirely so the rows reflow. Cards under
+   the fold leave it the same way — to the grid the two are the same thing. */
+.project-card.is-hidden,
+.project-card.is-folded {
   display: none;
+}
+
+/* ---------- show more ---------- */
+
+.work-more {
+  display: flex;
+  justify-content: center;
+  padding: 20px var(--pad) 0;
+}
+
+/* Empty before the data lands; hidden by applyFold() once there is nothing
+   left under the fold to reveal. Either way the row of padding goes too. */
+.work-more:empty,
+.work-more[hidden] {
+  display: none;
+}
+
+.work-more-btn {
+  padding: 11px 22px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+
+.work-more-btn:active {
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 /* ---------- tab switch choreography ----------
@@ -630,12 +711,11 @@ button {
   animation-timing-function: var(--ease);
 }
 
-/* Nothing outside the grid changes on a tab switch, so paying for a
-   full-viewport crossfade would be waste. Named elements still animate. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-}
+/* The root pair keeps its default cross-fade. Suppressing it used to be free —
+   nothing outside the grid changed on a tab switch — but the tab labels shift
+   colour and the show-more button changes its text and can leave altogether.
+   With both root snapshots held at full opacity those changes render twice,
+   one state ghosted over the other, for the length of the transition. */
 
 @keyframes card-leave {
   to {
@@ -665,195 +745,333 @@ button {
   animation: card-enter 240ms var(--ease) backwards;
 }
 
+/* The export ships as a Tailwind component used inside
+   `grid gap-7 sm:grid-cols-2 lg:grid-cols-3`; the gap is its gap-7, but the
+   third column is dropped — two cards to a row give the screenshot and the
+   description enough width to be worth showing at all. */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--project-card-min), 1fr));
-  gap: 14px;
+  grid-template-columns: 1fr;
+  gap: 28px;
   padding: 0 var(--pad) 8px;
 }
 
-/* ---------- project cards ---------- */
-
-.project-card {
-  /* Each card carries a unique view-transition-name (set at render time); this
-     shared class is what the ::view-transition-* rules below select on, so the
-     enter/leave choreography is written once rather than per card. */
-  view-transition-class: project-card-snapshot;
-  min-width: 0;
-  position: relative;
-  border: 1px solid var(--line);
-  border-radius: 0 4px 4px 4px;
-  overflow: visible;
-  background: var(--card-bg);
-  margin-top: 16px;
-}
-
-/* The folder tab */
-.project-card::after {
-  content: "";
-  position: absolute;
-  top: -15px;
-  left: -1px;
-  width: 40%;
-  min-width: 70px;
-  height: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--line);
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  z-index: -1;
-}
-
-/* Touch press feedback — mobile has no hover to signal "this is tappable". */
-.project-card:has(.project-link:active),
-.project-card:has(.project-link:active)::after {
-  border-color: var(--project-accent, var(--ink));
-}
-
-.project-card:has(.project-link:active) {
-  transform: scale(0.985);
-}
-
-.project-card {
-  transition: transform 0.16s var(--ease), border-color 0.2s var(--ease);
-}
-
-/* Featured project indicator */
-.project-card.featured::before {
-  content: "✦";
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  font-size: 0.7rem;
-  color: var(--project-accent, var(--muted));
-  z-index: 5;
-  opacity: 0.7;
-  line-height: 1;
-}
-
-/* overlay for ongoing projects */
-.project-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--overlay-bg);
-  z-index: 8;
-  pointer-events: auto;
-  border-radius: 0 4px 4px 4px;
-}
-
-.overlay-badge {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--ink);
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-@media (prefers-color-scheme: dark) {
-  .overlay-badge {
-    background: rgba(255, 255, 255, 0.06);
+@media (min-width: 640px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.project-card.ongoing .project-link {
-  filter: grayscale(60%) opacity(0.9);
-}
+/* ---------- project cards ----------
 
-.project-link {
+   A port of export/ProjectCard.jsx. Every dimension, duration and easing curve
+   is the component's; only the palette is swapped — the hard-coded browns and
+   the orange accent become the site's theme tokens, so the cards follow the
+   light/dark toggle instead of forcing a dark card onto a paper page.
+   Per-card values (--project-accent, --project-glow, --project-pattern,
+   --project-pattern-zoom) are set inline by renderProjects().
+
+   The v1 cards this replaced are archived in legacy/project-cards-v1/. */
+
+.project-card {
+  /* Each card carries a unique view-transition-name (set at render time); this
+     shared class is what the ::view-transition-* rules above select on, so the
+     enter/leave choreography is written once rather than per card. */
+  view-transition-class: project-card-snapshot;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 15px 16px 16px;
-  min-height: 100%;
+  min-height: 520px;
   min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--card-bg);
+  transition: border-color 0.4s var(--ease), transform 0.16s var(--ease);
+}
+
+/* Touch press feedback — mobile has no hover to signal "this is tappable". */
+.project-card:has(.project-open:active) {
+  border-color: var(--project-accent, var(--ink));
+  transform: scale(0.985);
+}
+
+/* ---------- preview ---------- */
+
+.project-preview {
+  position: relative;
+  height: 200px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
   cursor: pointer;
 }
 
-.project-top {
+/* Ambient wash behind the screenshot. Sits under the shot rather than on it,
+   so what comes up on hover is the space around the frame.
+
+   The wash box only fades and feathers; its child carries the artwork. The
+   feather is deliberately gentle: the shot covers the middle of the preview,
+   so the wash is read through the strip around it, and a mask that emptied
+   the edges would erase the only part of it anyone sees. It just falls off
+   toward the corners so the pattern has some depth in the frame. */
+.project-preview-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 620ms;
+  -webkit-mask-image: radial-gradient(120% 115% at 50% 34%, #000 40%, rgba(0, 0, 0, 0.4) 100%);
+          mask-image: radial-gradient(120% 115% at 50% 34%, #000 40%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+/* The pre-pattern glow, and still the wash on any browser that cannot mask by
+   luminance — a card should lose the swirl, not the hover state. */
+.project-preview-swirl {
+  /* How close the card sits to the pattern, from js/config.js or a project's
+     own patternZoom. Floored at 1 — that is the point where the pattern just
+     covers the preview, and anything under it pulls the wash off the edges. */
+  --swirl-zoom: max(1, var(--project-pattern-zoom, 1));
+  position: absolute;
+  inset: -30%;
+  filter: blur(34px);
+  background: radial-gradient(60% 60% at 50% 40%, var(--project-glow, transparent), transparent 70%);
+}
+
+/* The swirl itself: a generated PNG (scripts/swirl.py), named per project by
+   "pattern" in projects.json and otherwise by config.projectPattern.
+
+   The same image is both the paint and the mask, read as luminance: the bright
+   ribbons keep their generated colour, the near-black plate they sit on falls
+   away to nothing. So a pattern drops onto any card without having to match
+   the theme — and the colour it washes the preview with is chosen once, in the
+   script that drew it, rather than negotiated here.
+
+   Sized to cover and zoomed by transform rather than by background-size: what
+   the preview crops out of a pattern depends on how wide the card is, and a
+   scale on top of cover is the one way to say "closer in" that means the same
+   thing in a one- and a two-column grid. */
+@supports (mask-mode: luminance) {
+  .project-preview-swirl {
+    inset: 0;
+    opacity: var(--swirl-strength, 0.7);
+    /* Filtered before it is masked, so this tones the ribbons themselves and
+       leaves which pixels survive to the untouched image. */
+    filter: var(--swirl-tone, none);
+    background: var(--project-pattern, none) center / cover no-repeat;
+    mask-image: var(--project-pattern, none);
+    mask-mode: luminance;
+    mask-size: cover;
+    mask-position: center;
+    /* Settles back to rest as the wash comes up, so the pattern drifts in
+       under the shot instead of switching on. Matches the shot's own curve.
+       The drift is a zoom in, so it never uncovers the preview on its way. */
+    transform: scale(calc(var(--swirl-zoom) * 1.07));
+    transition: transform 900ms cubic-bezier(0.16, 0.84, 0.28, 1);
+    will-change: transform;
+  }
+}
+
+/* The screenshot is cropped by the preview box and runs past its bottom edge,
+   so it reads as a window onto a taller page. */
+.project-shot {
+  position: absolute;
+  top: 24px;
+  right: 22px;
+  bottom: -18px;
+  left: 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.6);
+  transition: transform 620ms cubic-bezier(0.16, 0.84, 0.28, 1),
+              box-shadow 620ms cubic-bezier(0.16, 0.84, 0.28, 1);
+  will-change: transform;
+}
+
+.project-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* Stand-in for a project with no screenshot yet. */
+.project-shot-empty {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  background: repeating-linear-gradient(135deg,
+      var(--surface) 0 8px,
+      var(--card-bg) 8px 16px);
+}
+
+/* ---------- body ---------- */
+
+.project-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 20px 22px 22px;
+}
+
+/* The component is inert — every card here also opens the detail modal, so the
+   text block is the button and the action links stay outside it. */
+.project-open {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  cursor: pointer;
 }
 
 .project-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .project-title {
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1.1;
   margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  color: var(--ink);
   overflow-wrap: anywhere;
 }
 
-.card-demo-link {
+.project-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--project-accent, var(--muted));
-  border: 1px solid var(--project-accent, var(--line));
-  border-radius: 999px;
-  padding: 2px 8px;
-  text-decoration: none;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
-  white-space: nowrap;
-  line-height: 1.5;
 }
 
-.card-demo-link:active {
-  background: var(--project-accent, var(--muted));
-  color: var(--bg);
+.project-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--live);
+  animation: status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.project-status-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.project-status-mark {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--project-accent, var(--muted));
 }
 
 .project-tagline {
-  font-size: 0.84rem;
-  font-weight: 400;
-  color: var(--project-accent, var(--muted));
   margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--project-accent, var(--muted));
   overflow-wrap: anywhere;
 }
 
 .project-desc {
-  font-size: 0.9rem;
-  line-height: 1.45;
-  color: var(--ink);
   margin: 0;
+  font-size: 14px;
+  line-height: 1.625;
+  color: var(--muted);
+  text-wrap: pretty;
   overflow-wrap: anywhere;
 }
 
+/* ---------- tags & actions ---------- */
+
+.project-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Bare mono labels separated by whitespace — no pills. */
 .project-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
-  margin-top: auto;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--faint);
 }
 
-.project-tags li {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.02em;
+.project-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.project-actions.is-pair {
+  grid-template-columns: 1fr 1fr;
+}
+
+.project-action {
+  padding: 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
+              color 0.2s var(--ease);
+}
+
+/* The export's solid orange button, kept as one fixed colour. Filling it with
+   the project's own accent made the primary action a different colour on every
+   card, and a light accent turned it into a button that all but vanished on
+   paper — the accent still carries the tagline, where it is a colour rather
+   than a surface something has to be legible on. */
+.project-action-live {
+  font-weight: 600;
+  background: var(--cta);
+  color: var(--cta-ink);
+  border: 1px solid transparent;
+}
+
+.project-action-live:active {
+  filter: brightness(1.12);
+}
+
+.project-action-repo {
+  font-weight: 500;
+  border: 1px solid var(--line);
   color: var(--muted);
-  background: var(--surface);
-  border-radius: 999px;
-  padding: 4px 8px;
-  transition: color 0.2s var(--ease);
+}
+
+.project-action-repo:active {
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .noscript-note {
@@ -1592,6 +1810,11 @@ button {
     color: var(--ink);
   }
 
+  .work-more-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
   .theme-toggle:hover {
     transform: scale(1.12);
   }
@@ -1600,8 +1823,7 @@ button {
     transform: scale(1.08);
   }
 
-  .intro-tags li:hover,
-  .project-tags li:hover {
+  .intro-tags li:hover {
     border-color: var(--ink);
     color: var(--ink);
   }
@@ -1610,14 +1832,33 @@ button {
     color: var(--ink);
   }
 
-  .card-demo-link:hover {
-    background: var(--project-accent, var(--muted));
-    color: var(--bg);
+  /* The component's whole hover state — the border lifts, the wash behind the
+     screenshot comes up, and the shot itself rises and grows a shadow. All of
+     it is CSS on the card; nothing here runs per frame. */
+  .project-card:hover {
+    border-color: var(--faint);
   }
 
-  .project-card:hover,
-  .project-card:hover::after {
-    border-color: var(--accent, var(--ink));
+  .project-card:hover .project-preview-wash {
+    opacity: 1;
+  }
+
+  .project-card:hover .project-preview-swirl {
+    transform: scale(var(--swirl-zoom));
+  }
+
+  .project-card:hover .project-shot {
+    transform: translateY(-9px) scale(1.04);
+    box-shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.85);
+  }
+
+  .project-action-live:hover {
+    filter: brightness(1.12);
+  }
+
+  .project-action-repo:hover {
+    border-color: var(--ink);
+    color: var(--ink);
   }
 
   .footer-clock:hover {
@@ -1651,10 +1892,6 @@ button {
 /* Tablets, foldables and large phones in landscape — the old stylesheet
    jumped straight from the desktop grid to a single column. */
 @media (min-width: 641px) and (max-width: 900px) {
-  :root {
-    --project-card-min: 300px;
-  }
-
   .intro {
     min-height: 70svh;
   }
@@ -1680,10 +1917,6 @@ button {
   .work-head {
     align-items: flex-start;
     margin-bottom: 28px;
-  }
-
-  .projects-grid {
-    grid-template-columns: 1fr;
   }
 
   /* Hero stays left-aligned like the rest of the column; the image sits
@@ -1726,16 +1959,18 @@ button {
 
   /* Sub-0.7rem type lands around 9-10px on a phone — under the legibility
      floor. Nudge the smallest labels back up. */
-  .project-top,
-  .project-tags li,
   .bento-label,
   .work-tab {
     font-size: 0.72rem;
   }
 
-  /* Bigger type needs a tighter gutter to keep three tabs on one line at 320px. */
+  /* The labels step up a size here; without the counts three of them still
+     sit on one track at 320px with the padding intact. */
+  .work-tab {
+    padding: 9px 12px;
+  }
+
   .work-tabs {
-    gap: 18px;
     margin-bottom: 22px;
   }
 
@@ -1774,5 +2009,9 @@ button {
   .project-card {
     opacity: 1;
     transform: none;
+  }
+
+  .project-preview-swirl {
+    transform: scale(var(--swirl-zoom));
   }
 }

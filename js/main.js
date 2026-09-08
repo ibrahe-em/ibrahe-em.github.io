@@ -17,6 +17,16 @@
 
   const $ = (sel, ctx) => (ctx || document).querySelector(sel);
 
+  /* ---------- feature flags ---------- */
+
+  /* js/config.js, loaded just before this file. Anything it does not say is on:
+     a stale or missing config should leave the site whole, not strip it down. */
+  const config = window.SITE_CONFIG || {};
+
+  function featureOn(name) {
+    return config[name] !== false;
+  }
+
   /* ---------- theme toggle ---------- */
 
   const themeToggle = $("#themeToggle");
@@ -64,7 +74,13 @@
       const normalized = normalizeProjectData(data);
       renderSectionHeading(normalized.projectsSection, "#workIndex", "#workHeading");
       renderProjects(normalized.projects);
+      // Before renderTabs: its initial applyFilter() folds the grid, and the
+      // button has to exist by then to be labelled.
+      renderMoreButton();
       renderTabs(normalized.projects);
+      // renderTabs returns early when the data holds one kind of project, so
+      // the first fold cannot be left to the filter alone.
+      applyFold();
       observeCards();
     })
     .catch((err) => {
@@ -107,55 +123,146 @@
   /* ---------- store projects for modal ---------- */
   let allProjects = [];
 
+  /* ---------- project cards ----------
+
+     A port of export/ProjectCard.jsx to the site's markup. The component takes
+     a few props the data file does not carry, so they are derived here rather
+     than duplicated into projects.json: the preview shot is the project's first
+     screenshot, the hover wash is mixed from the same accent the tagline uses,
+     and a project with a deployed URL counts as live.
+
+     The v1 cards are archived in legacy/project-cards-v1/. */
+
+  function previewOf(p) {
+    if (p.image) return p.image;
+    const shots = p.detail && p.detail.screenshots;
+    return (shots && shots[0]) || "";
+  }
+
+  /* The hover wash behind the screenshot is a swirl PNG from scripts/swirl.py.
+     A project names its own with "pattern" in projects.json; anything without
+     one falls back to config.projectPattern. Either can be "" to opt out —
+     a card with no pattern simply keeps a plain preview on hover. */
+  const DEFAULT_PATTERN = "assets/patterns/default.png";
+
+  function patternOf(p) {
+    const src = p.pattern !== undefined ? p.pattern
+      : config.projectPattern !== undefined ? config.projectPattern
+      : DEFAULT_PATTERN;
+    if (!src) return "none";
+    // Absolute, because a url() that reaches a property through a custom
+    // property is resolved against the stylesheet that used it — a relative
+    // path here would be hunted for under css/, where nothing lives.
+    // Single quotes: this lands in a double-quoted style attribute.
+    const href = new URL(src, document.baseURI).href.replace(/'/g, "%27");
+    return `url('${href}')`;
+  }
+
+  /* How close the card sits to the pattern: 1 just covers the preview, 2 is
+     twice as close. Per project first, then config, and a card cannot go under
+     1 — below that the pattern stops reaching the edges of the preview and the
+     wash tears off them. A swirl that reads too coarse at 1 wants a finer
+     render (swirl.py --scale), not a smaller one. */
+  function zoomOf(p) {
+    const raw = p.patternZoom !== undefined ? p.patternZoom : config.projectPatternZoom;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  }
+
+  /* The pattern is masked by its own brightness, so a card still wants a
+     colour underneath it — and it is the whole wash on browsers with no
+     luminance masking. One accent per project in the data file mixes both. */
+  function glowOf(p) {
+    const hex = /^#([0-9a-f]{6})$/i.exec(p.accent || "");
+    if (!hex) return "transparent";
+    const n = parseInt(hex[1], 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, 0.38)`;
+  }
+
+  /* "live" earns the pulsing dot; anything else is the component's ◆ mark. An
+     explicit status in the data wins, so a project can say "extension" or
+     "archived" without a deployed URL having to imply it. */
+  function statusOf(p) {
+    if (p.status) return p.status;
+    if (p.ongoing) return "in progress";
+    return p.deployed_url ? "live" : "";
+  }
+
+  function statusMarkup(status) {
+    if (!status) return "";
+    if (status === "live") {
+      return `<span class="project-status">
+              <span class="project-status-dot" aria-hidden="true"></span>
+              <span class="project-status-label">live</span>
+            </span>`;
+    }
+    return `<span class="project-status-mark" role="img" aria-label="${status}" title="${status}">◆</span>`;
+  }
+
   function renderProjects(projects) {
     allProjects = projects;
     const list = $("#projectList");
     list.innerHTML = projects
-      .map((p, i) => {
-        const featuredClass = p.featured ? " featured" : "";
-        const ongoingClass = p.ongoing ? " ongoing" : "";
+      .map((p) => {
+        const shot = previewOf(p);
+        const status = statusOf(p);
+        const liveUrl = p.deployed_url || "";
+        // Several projects point `url` at the client's site rather than a repo;
+        // only an actual GitHub link gets the GitHub button.
+        const githubUrl = /(^|\/\/)([^/]*\.)?github\.com\//.test(p.url || "") ? p.url : "";
+        const actions = [liveUrl, githubUrl].filter(Boolean).length;
+
         return `
-        <li class="project-card${featuredClass}${ongoingClass}" style="--project-accent:${p.accent}; --card-i:${i}; view-transition-name:card-${p.id};" data-project-id="${p.id}" data-kind="${kindOf(p)}">
-          <div class="project-link" role="button" tabindex="0" aria-label="View ${p.title} details">
-            <div class="project-title-row">
-              <h3 class="project-title">${p.title}</h3>
-              ${p.deployed_url ? `<a class="card-demo-link" href="${p.deployed_url}" target="_blank" rel="noopener noreferrer" aria-label="Live demo" title="Live demo">Live <span aria-hidden="true">↗</span></a>` : ''}
+        <li class="project-card" style="--project-accent:${p.accent}; --project-glow:${glowOf(p)}; --project-pattern:${patternOf(p)}; --project-pattern-zoom:${zoomOf(p)}; view-transition-name:card-${p.id};" data-project-id="${p.id}" data-kind="${kindOf(p)}">
+          <div class="project-preview">
+            <span class="project-preview-wash" aria-hidden="true">
+              <span class="project-preview-swirl"></span>
+            </span>
+            <div class="project-shot">
+              ${shot
+                ? `<img src="${shot}" alt="${p.title}" width="750" height="450" loading="lazy" decoding="async">`
+                : `<div class="project-shot-empty">product shot</div>`}
             </div>
-            <p class="project-tagline">${p.tagline}</p>
-            <p class="project-desc">${p.description}</p>
-            
-            <ul class="project-tags">
-              ${p.tags.map((t) => `<li>${t}</li>`).join("")}
-            </ul>
           </div>
-          ${p.ongoing ? '<div class="project-overlay" role="status" aria-label="In progress"><span class="overlay-badge">In progress</span></div>' : ''}
+
+          <div class="project-body">
+            <div class="project-open" role="button" tabindex="0" aria-label="View ${p.title} details">
+              <div class="project-title-row">
+                <h3 class="project-title">${p.title}</h3>
+                ${statusMarkup(status)}
+              </div>
+              <p class="project-tagline">${p.tagline}</p>
+              <p class="project-desc">${p.description}</p>
+            </div>
+
+            <div class="project-foot">
+              ${p.tags.length ? `<ul class="project-tags">${p.tags.map((t) => `<li>${t}</li>`).join("")}</ul>` : ""}
+              ${actions ? `
+              <div class="project-actions${actions === 2 ? " is-pair" : ""}">
+                ${liveUrl ? `<a class="project-action project-action-live" href="${liveUrl}" target="_blank" rel="noopener noreferrer">View Live</a>` : ""}
+                ${githubUrl ? `<a class="project-action project-action-repo" href="${githubUrl}" target="_blank" rel="noopener noreferrer">GitHub</a>` : ""}
+              </div>` : ""}
+            </div>
+          </div>
         </li>`;
       })
       .join("");
 
-    // Attach click handlers to each card
     list.querySelectorAll(".project-card").forEach((card) => {
-      const link = card.querySelector(".project-link");
-      if (!link) return;
-
-      // Don't let demo link clicks open the modal
-      card.querySelectorAll(".card-demo-link").forEach((link) => {
-        link.addEventListener("click", (e) => e.stopPropagation());
-      });
-
       function openCard(e) {
-        // Don't open modal for ongoing projects
-        if (card.classList.contains("ongoing")) return;
-        // Don't open modal when clicking demo link
-        if (e.target.closest(".card-demo-link")) return;
+        // The action buttons are links to somewhere else, not a way in.
+        if (e.target.closest("a")) return;
         e.preventDefault();
-        const id = card.dataset.projectId;
-        const project = allProjects.find((p) => p.id === id);
+        const project = allProjects.find((p) => p.id === card.dataset.projectId);
         if (project) openModal(project);
       }
 
-      link.addEventListener("click", openCard);
-      link.addEventListener("keydown", (e) => {
+      // The screenshot is part of the same target as the text below it.
+      card.querySelector(".project-preview").addEventListener("click", openCard);
+
+      const open = card.querySelector(".project-open");
+      open.addEventListener("click", openCard);
+      open.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           openCard(e);
@@ -186,6 +293,14 @@
     const bar = $("#workTabs");
     if (!bar) return;
 
+    // Switched off, the bar is left empty and :empty takes the control off the
+    // page. No filter ever runs, so every card stays visible and the fold —
+    // applied separately by the load path — still holds the grid to two rows.
+    if (!featureOn("projectTabs")) {
+      bar.innerHTML = "";
+      return;
+    }
+
     const counts = projects.reduce((acc, p) => {
       const k = kindOf(p);
       acc[k] = (acc[k] || 0) + 1;
@@ -200,16 +315,15 @@
       return;
     }
 
-    const tabs = [{ id: ALL, label: "All", count: projects.length }].concat(
-      present.map((t) => ({ id: t.id, label: t.label, count: counts[t.id] }))
+    // counts decide which buckets exist; the labels themselves stay bare.
+    const tabs = [{ id: ALL, label: "All" }].concat(
+      present.map((t) => ({ id: t.id, label: t.label }))
     );
 
     bar.innerHTML = tabs
       .map(
         (t) => `
-        <button type="button" class="work-tab" data-kind="${t.id}" aria-pressed="false">
-          ${t.label}<span class="work-tab-count" aria-hidden="true">${String(t.count).padStart(2, "0")}</span>
-        </button>`
+        <button type="button" class="work-tab" data-kind="${t.id}" aria-pressed="false">${t.label}</button>`
       )
       .join("");
 
@@ -228,8 +342,10 @@
     // transition would defer the marker's first placement into a callback.
     applyFilter(initial, false, false);
 
-    // Drop the suppressor only once the browser has painted the marker where it
-    // belongs, otherwise it visibly slides in from the left on first load.
+    // Resolve the chip's first geometry while the suppressor is still on. Without
+    // this read the removal below is the first style change the element has ever
+    // seen, and it transitions in from zero width at the track's left edge.
+    void indicator.offsetWidth;
     requestAnimationFrame(() => indicator.classList.remove("is-initial"));
 
     // The marker is positioned in pixels, so a resize invalidates it. Measuring
@@ -245,15 +361,89 @@
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
+  /* View transitions let the browser tween the two layouts itself, on the
+     compositor. Where the API is missing the swap is simply instant, and
+     reduced-motion opts out on purpose rather than by accident. */
+  function morph(commit) {
+    if (!document.startViewTransition || prefersReducedMotion()) {
+      commit();
+      return;
+    }
+
+    // The tab chip animates itself the rest of the time; for the length of the
+    // transition the group morph owns it instead, and the two must not overlap.
+    const bar = $("#workTabs");
+    if (bar) bar.classList.add("is-morphing");
+    const view = document.startViewTransition(commit);
+    // A skipped transition rejects ready; nothing here needs to know, but an
+    // unhandled rejection would still be reported.
+    view.ready.catch(() => {});
+    // finished settles whether the transition ran or was skipped, so the chip
+    // always gets its own animation back.
+    view.finished.finally(() => {
+      if (bar) bar.classList.remove("is-morphing");
+    });
+  }
+
+  /* ---------- the fold ----------
+
+     Two columns of tall cards put the last project a long way down the page, so
+     the grid opens at two rows and the rest arrive on request. Folded cards are
+     hidden with a class, exactly like filtered-out ones, which keeps every
+     card's handlers attached and lets the same view transition carry them in. */
+
+  const CARDS_BEFORE_FOLD = 4;
+  let projectsExpanded = false;
+
+  function renderMoreButton() {
+    const host = $("#workMore");
+    if (!host) return;
+
+    host.innerHTML =
+      '<button type="button" class="work-more-btn" id="workMoreBtn" aria-controls="projectList"></button>';
+
+    $("#workMoreBtn").addEventListener("click", () => {
+      morph(() => {
+        projectsExpanded = !projectsExpanded;
+        applyFold();
+      });
+    });
+  }
+
+  function applyFold() {
+    const cards = Array.from(document.querySelectorAll("#projectList .project-card"));
+    // What the current filter leaves on the page is what the fold counts.
+    const shown = cards.filter((c) => !c.classList.contains("is-hidden"));
+    const under = Math.max(0, shown.length - CARDS_BEFORE_FOLD);
+
+    cards.forEach((c) => c.classList.remove("is-folded"));
+    if (!projectsExpanded) {
+      shown.slice(CARDS_BEFORE_FOLD).forEach((c) => c.classList.add("is-folded"));
+    }
+
+    const host = $("#workMore");
+    const btn = $("#workMoreBtn");
+    if (!host || !btn) return;
+    // A filter can leave fewer projects than the fold holds; then the control
+    // has nothing to reveal and goes away rather than sitting there inert.
+    host.hidden = under === 0;
+    btn.hidden = under === 0;
+    btn.setAttribute("aria-expanded", String(projectsExpanded));
+    btn.textContent = projectsExpanded
+      ? "Show fewer projects"
+      : `Show ${under} more project${under === 1 ? "" : "s"}`;
+  }
+
   /* Reads two layout properties and writes two custom properties — no per-frame
-     JavaScript. The move itself is a transform, so it stays on the compositor. */
+     JavaScript. offsetLeft is measured from the track's padding edge, which is
+     where the chip's own left: 0 sits, so the two line up without correction. */
   function moveIndicator() {
     const bar = $("#workTabs");
     const indicator = bar && bar.querySelector(".work-tabs-indicator");
     const active = bar && bar.querySelector('.work-tab[aria-pressed="true"]');
     if (!indicator || !active) return;
     indicator.style.setProperty("--ind-x", `${active.offsetLeft}px`);
-    indicator.style.setProperty("--ind-w", String(active.offsetWidth));
+    indicator.style.setProperty("--ind-w", `${active.offsetWidth}px`);
   }
 
   function applyFilter(kind, updateUrl, animate = true) {
@@ -269,17 +459,16 @@
         card.classList.toggle("is-hidden", !show);
       });
 
+      // Each tab starts folded — a filter the visitor chose is a fresh set of
+      // projects, not a continuation of the one they had already opened up.
+      projectsExpanded = false;
+      applyFold();
+
       moveIndicator();
     };
 
-    // View transitions let the browser tween the two layouts itself, on the
-    // compositor. Where the API is missing the swap is simply instant, and
-    // reduced-motion opts out on purpose rather than by accident.
-    if (animate && document.startViewTransition && !prefersReducedMotion()) {
-      document.startViewTransition(commit);
-    } else {
-      commit();
-    }
+    if (animate) morph(commit);
+    else commit();
 
     if (!updateUrl) return;
     // replaceState, not pushState: the address bar stays shareable without

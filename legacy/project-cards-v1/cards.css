@@ -1,0 +1,240 @@
+/* ============================================================
+   ARCHIVED — project cards, version 1 ("folder tab" cards)
+   Lifted verbatim out of css/styles.css when the v2 cards
+   (export/ProjectCard.jsx) replaced them. Kept for reference /
+   rollback only; this file is NOT loaded by the site.
+
+   Original home: css/styles.css, between the tab-switch
+   choreography and the .noscript-note rule.
+   ============================================================ */
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--project-card-min), 1fr));
+  gap: 14px;
+  padding: 0 var(--pad) 8px;
+}
+
+/* ---------- project cards ---------- */
+
+.project-card {
+  /* Each card carries a unique view-transition-name (set at render time); this
+     shared class is what the ::view-transition-* rules below select on, so the
+     enter/leave choreography is written once rather than per card. */
+  view-transition-class: project-card-snapshot;
+  min-width: 0;
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 0 4px 4px 4px;
+  overflow: visible;
+  background: var(--card-bg);
+  margin-top: 16px;
+}
+
+/* The folder tab */
+.project-card::after {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: -1px;
+  width: 40%;
+  min-width: 70px;
+  height: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  z-index: -1;
+}
+
+/* Touch press feedback — mobile has no hover to signal "this is tappable". */
+.project-card:has(.project-link:active),
+.project-card:has(.project-link:active)::after {
+  border-color: var(--project-accent, var(--ink));
+}
+
+.project-card:has(.project-link:active) {
+  transform: scale(0.985);
+}
+
+.project-card {
+  transition: transform 0.16s var(--ease), border-color 0.2s var(--ease);
+}
+
+/* Featured project indicator */
+.project-card.featured::before {
+  content: "✦";
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.7rem;
+  color: var(--project-accent, var(--muted));
+  z-index: 5;
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* overlay for ongoing projects */
+.project-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--overlay-bg);
+  z-index: 8;
+  pointer-events: auto;
+  border-radius: 0 4px 4px 4px;
+}
+
+.overlay-badge {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ink);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (prefers-color-scheme: dark) {
+  .overlay-badge {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.project-card.ongoing .project-link {
+  filter: grayscale(60%) opacity(0.9);
+}
+
+.project-link {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 15px 16px 16px;
+  min-height: 100%;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.project-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-title {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.card-demo-link {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--project-accent, var(--muted));
+  border: 1px solid var(--project-accent, var(--line));
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-decoration: none;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.card-demo-link:active {
+  background: var(--project-accent, var(--muted));
+  color: var(--bg);
+}
+
+.project-tagline {
+  font-size: 0.84rem;
+  font-weight: 400;
+  color: var(--project-accent, var(--muted));
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.project-desc {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--ink);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: auto;
+}
+
+.project-tags li {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 4px 8px;
+  transition: color 0.2s var(--ease);
+}
+
+/* ---------- companion rules that lived elsewhere in styles.css ---------- */
+
+/* from the "hover states" block */
+@media (hover: hover) and (pointer: fine) {
+  .project-tags li:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .card-demo-link:hover {
+    background: var(--project-accent, var(--muted));
+    color: var(--bg);
+  }
+
+  .project-card:hover,
+  .project-card:hover::after {
+    border-color: var(--accent, var(--ink));
+  }
+}
+
+/* from the "responsive" block */
+@media (min-width: 641px) and (max-width: 900px) {
+  :root {
+    --project-card-min: 300px;
+  }
+}
+
+@media (max-width: 640px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Sub-0.7rem type lands around 9-10px on a phone — under the legibility
+     floor. Nudge the smallest labels back up. */
+  .project-top,
+  .project-tags li {
+    font-size: 0.72rem;
+  }
+}

@@ -1,5 +1,109 @@
 [
   {
+    "id": "true-momentum",
+    "index": "📈",
+    "title": "True Momentum",
+    "tagline": "Turning an AI pipeline into a real product",
+    "description": "I built the full-stack web application around an existing AI revenue-diagnostic pipeline. I designed and developed the user-facing experience, diagnostic flow, backend, payments, and supporting product infrastructure needed to turn the underlying system into something customers could actually use.",
+    "url": "https://true-momentum.vercel.app/",
+    "deployed_url": "https://true-momentum.vercel.app/",
+    "year": "2026",
+    "accent": "#adb05f",
+    "mark": "TM",
+    "featured": false,
+    "kind": "client",
+    "tags": [
+      "Full Stack",
+      "React",
+      "Node.js",
+      "AI"
+    ],
+    "detail": {
+      "problem": "The client already had the core AI analysis pipeline, but needed a proper product around it. The challenge was turning that underlying technology into a clear, trustworthy experience that could take a user from the initial assessment through to the final service.",
+      "solution": "I built the web application around the existing pipeline, including the landing pages, diagnostic experience, user flows, backend functionality, and payment integration. Rather than simply presenting the AI as a technical demo, I turned it into a complete customer-facing product designed around how someone would actually use the service.",
+      "stack": [
+        { "name": "React", "icon": "react" },
+        { "name": "Node.js", "icon": "nodejs" },
+        { "name": "Full Stack", "icon": "fullstack" },
+        { "name": "AI", "icon": "openai" }
+      ],
+      "screenshots": [
+        "assets/projects/true-momentum/home.png",
+        "assets/projects/generic.png"
+      ]
+    }
+  },
+  {
+    "id": "auspec-pharma",
+    "pattern":"assets/patterns/auspec.png",
+    "index": "💊",
+    "title": "Auspec Pharma",
+    "tagline": "A complete digital platform for a pharmaceutical company",
+    "description": "I built a full-stack website for Auspec Pharma with a public product and company portfolio, working contact system, and an internal admin portal. The admin system lets the team manage products and vacancies themselves and generate QR codes that link directly to digital product leaflets hosted in the cloud.",
+    "url": "https://auspecpharma.com/",
+    "deployed_url": "https://auspecpharma.com/",
+    "year": "2026",
+    "accent": "#617A69",
+    "mark": "AP",
+    "featured": false,
+    "kind": "client",
+    "tags": [
+      "Node.js",
+      "React",
+      "Full Stack",
+      "Cloudflare"
+    ],
+    "detail": {
+      "problem": "The company needed an initial professional web presence, but also needed more than a static website. Product information, hiring vacancies, and medicine leaflets needed to be managed and updated without having to rebuild the site every time something changed.",
+      "solution": "I built both the public website and the management system behind it. Authorized admins can add and update products, manage hiring vacancies, upload product leaflets, and generate QR codes for those leaflets to be placed on medicine packaging. This gives the company a single system for presenting its products publicly while managing its content internally.",
+      "stack": [
+        { "name": "Node.js", "icon": "nodejs" },
+        { "name": "React", "icon": "react" },
+        { "name": "Cloudflare", "icon": "cloudflare" },
+        { "name": "Full Stack", "icon": "fullstack" }
+      ],
+      "screenshots": [
+        "assets/projects/auspec/home.png",
+        "assets/projects/generic.png"
+      ]
+    }
+  },
+  {
+    "id": "flexplus",
+    "pattern":"assets/patterns/flex.png",
+    "index": "🧩",
+    "title": "FlexPlus",
+    "tagline": "A better university portal",
+    "description": "I built a browser extension that completely overhauls the FAST student portal without requiring any changes to the university's system. It replaces the cluttered interface with a cleaner experience and adds features like a prerequisite checker, SGPA/CGPA simulator, and total-fee calculator.",
+    "url": "https://github.com/maybethemuhammadibrahim/flexplus",
+    "year": "2026",
+    "accent": "#E84B1A",
+    "mark": "F+",
+    "featured": true,
+    "kind": "personal",
+    "tags": [
+      "JavaScript",
+      "HTML",
+      "CSS",
+      "Browser APIs"
+    ],
+    "detail": {
+      "problem": "The original student portal was difficult to navigate and often displayed important information in a confusing way. Students had to work around the interface just to do simple things like check grades, plan courses, or understand their fees.",
+      "solution": "I built FlexPlus to work on top of the existing portal. Once the original page loads, the extension reconstructs the interface into a cleaner layout and adds tools that weren't available in the original system. It required no access to the university's backend and was built independently, eventually reaching around 1,000 users.",
+      "stack": [
+        { "name": "JavaScript", "icon": "javascript" },
+        { "name": "HTML", "icon": "html" },
+        { "name": "CSS", "icon": "css" },
+        { "name": "Chrome APIs", "icon": "chrome" },
+        { "name": "DOM", "icon": "dom" }
+      ],
+      "screenshots": [
+        "assets/projects/flexplus/template.png",
+        "assets/projects/flexplus/usage.png"
+      ]
+    }
+  },
+  {
     "id": "mailmind",
     "index": "📧",
     "title": "MailMind",
@@ -33,41 +137,6 @@
         "assets/projects/mailmind/01.webp",
         "assets/projects/mailmind/02.webp",
         "assets/projects/mailmind/03.webp"
-      ]
-    }
-  },
-  {
-    "id": "flexplus",
-    "index": "🧩",
-    "title": "FlexPlus",
-    "tagline": "A better university portal",
-    "description": "I built a browser extension that completely overhauls the FAST student portal without requiring any changes to the university's system. It replaces the cluttered interface with a cleaner experience and adds features like a prerequisite checker, SGPA/CGPA simulator, and total-fee calculator.",
-    "url": "https://github.com/maybethemuhammadibrahim/flexplus",
-    "year": "2026",
-    "accent": "#E84B1A",
-    "mark": "F+",
-    "featured": true,
-    "kind": "personal",
-    "tags": [
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "Browser APIs"
-    ],
-    "detail": {
-      "problem": "The original student portal was difficult to navigate and often displayed important information in a confusing way. Students had to work around the interface just to do simple things like check grades, plan courses, or understand their fees.",
-      "solution": "I built FlexPlus to work on top of the existing portal. Once the original page loads, the extension reconstructs the interface into a cleaner layout and adds tools that weren't available in the original system. It required no access to the university's backend and was built independently, eventually reaching around 1,000 users.",
-      "stack": [
-        { "name": "JavaScript", "icon": "javascript" },
-        { "name": "HTML", "icon": "html" },
-        { "name": "CSS", "icon": "css" },
-        { "name": "Chrome APIs", "icon": "chrome" },
-        { "name": "DOM", "icon": "dom" }
-      ],
-      "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
       ]
     }
   },
@@ -136,74 +205,6 @@
       ],
       "screenshots": [
         "assets/projects/generic.png",
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
-      ]
-    }
-  },
-  {
-    "id": "true-momentum",
-    "index": "📈",
-    "title": "True Momentum",
-    "tagline": "Turning an AI pipeline into a real product",
-    "description": "I built the full-stack web application around an existing AI revenue-diagnostic pipeline. I designed and developed the user-facing experience, diagnostic flow, backend, payments, and supporting product infrastructure needed to turn the underlying system into something customers could actually use.",
-    "url": "https://true-momentum.vercel.app/",
-    "deployed_url": "https://true-momentum.vercel.app/",
-    "year": "2026",
-    "accent": "#2F7D6E",
-    "mark": "TM",
-    "featured": false,
-    "kind": "client",
-    "tags": [
-      "Full Stack",
-      "React",
-      "Node.js",
-      "AI"
-    ],
-    "detail": {
-      "problem": "The client already had the core AI analysis pipeline, but needed a proper product around it. The challenge was turning that underlying technology into a clear, trustworthy experience that could take a user from the initial assessment through to the final service.",
-      "solution": "I built the web application around the existing pipeline, including the landing pages, diagnostic experience, user flows, backend functionality, and payment integration. Rather than simply presenting the AI as a technical demo, I turned it into a complete customer-facing product designed around how someone would actually use the service.",
-      "stack": [
-        { "name": "React", "icon": "react" },
-        { "name": "Node.js", "icon": "nodejs" },
-        { "name": "Full Stack", "icon": "fullstack" },
-        { "name": "AI", "icon": "openai" }
-      ],
-      "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
-      ]
-    }
-  },
-  {
-    "id": "auspec-pharma",
-    "index": "💊",
-    "title": "Auspec Pharma",
-    "tagline": "A complete digital platform for a pharmaceutical company",
-    "description": "I built a full-stack website for Auspec Pharma with a public product and company portfolio, working contact system, and an internal admin portal. The admin system lets the team manage products and vacancies themselves and generate QR codes that link directly to digital product leaflets hosted in the cloud.",
-    "url": "https://auspecpharma.com/",
-    "deployed_url": "https://auspecpharma.com/",
-    "year": "2026",
-    "accent": "#617A69",
-    "mark": "AP",
-    "featured": false,
-    "kind": "client",
-    "tags": [
-      "Node.js",
-      "React",
-      "Full Stack",
-      "Cloudflare"
-    ],
-    "detail": {
-      "problem": "The company needed an initial professional web presence, but also needed more than a static website. Product information, hiring vacancies, and medicine leaflets needed to be managed and updated without having to rebuild the site every time something changed.",
-      "solution": "I built both the public website and the management system behind it. Authorized admins can add and update products, manage hiring vacancies, upload product leaflets, and generate QR codes for those leaflets to be placed on medicine packaging. This gives the company a single system for presenting its products publicly while managing its content internally.",
-      "stack": [
-        { "name": "Node.js", "icon": "nodejs" },
-        { "name": "React", "icon": "react" },
-        { "name": "Cloudflare", "icon": "cloudflare" },
-        { "name": "Full Stack", "icon": "fullstack" }
-      ],
-      "screenshots": [
         "assets/projects/generic.png",
         "assets/projects/generic.png"
       ]
