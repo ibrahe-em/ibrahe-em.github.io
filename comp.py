@@ -274,7 +274,7 @@ def parse_args(argv=None):
     p = argparse.ArgumentParser(
         description="Optimize images for the web.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    p.add_argument("source", nargs="?", default="./assets/projects",
+    p.add_argument("source", nargs="?", default="./assets/patterns",
                    help="directory to scan (recursively)")
     p.add_argument("-o", "--out", default=None,
                    help="output directory [default: <source>-optimized]")
