@@ -134,9 +134,7 @@
         { "name": "PostgreSQL", "icon": "postgresql" }
       ],
       "screenshots": [
-        "assets/projects/mailmind/01.webp",
-        "assets/projects/mailmind/02.webp",
-        "assets/projects/mailmind/03.webp"
+        "assets/projects/mailmind/home.png"
       ]
     }
   },
