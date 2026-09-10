@@ -9,6 +9,10 @@
   <title>Muhammad Ibrahim</title>
   <link rel="icon" type="image/png" href="assets/ibrahim_favicon.png">
   <link rel="preload" href="assets/fonts/Rubik-VariableFont_wght.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- Screenshots come from the delivery base in js/config.js. The handshake
+       to a third origin costs a DNS lookup and a TLS round trip; starting it
+       here means the first card image is not paying for both. -->
+  <link rel="preconnect" href="https://res.cloudinary.com">
   <link rel="stylesheet" href="css/styles.css">
   <script>
     const savedTheme = localStorage.getItem("theme");

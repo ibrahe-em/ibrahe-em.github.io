@@ -4,7 +4,7 @@
     "index": "📈",
     "title": "True Momentum",
     "tagline": "Turning an AI pipeline into a real product",
-    "description": "I built the full-stack web application around an existing AI revenue-diagnostic pipeline. I designed and developed the user-facing experience, diagnostic flow, backend, payments, and supporting product infrastructure needed to turn the underlying system into something customers could actually use.",
+    "description": "An AI-powered revenue diagnostic platform that guides businesses through an assessment and turns their data into actionable revenue insights.",
     "url": "https://true-momentum.vercel.app/",
     "deployed_url": "https://true-momentum.vercel.app/",
     "year": "2026",
@@ -28,8 +28,8 @@
         { "name": "AI", "icon": "openai" }
       ],
       "screenshots": [
-        "assets/projects/true-momentum/home.png",
-        "assets/projects/generic.png"
+        "homepage",
+        "assets/projects-optimized/generic.webp"
       ]
     }
   },
@@ -39,7 +39,7 @@
     "index": "💊",
     "title": "Auspec Pharma",
     "tagline": "A complete digital platform for a pharmaceutical company",
-    "description": "I built a full-stack website for Auspec Pharma with a public product and company portfolio, working contact system, and an internal admin portal. The admin system lets the team manage products and vacancies themselves and generate QR codes that link directly to digital product leaflets hosted in the cloud.",
+    "description": "A digital platform for a pharmaceutical company that showcases its products and services while providing an internal system to manage products, vacancies, and digital medicine leaflets.",
     "url": "https://auspecpharma.com/",
     "deployed_url": "https://auspecpharma.com/",
     "year": "2026",
@@ -63,8 +63,7 @@
         { "name": "Full Stack", "icon": "fullstack" }
       ],
       "screenshots": [
-        "assets/projects/auspec/home.png",
-        "assets/projects/generic.png"
+        "auspec-home"
       ]
     }
   },
@@ -74,7 +73,7 @@
     "index": "🧩",
     "title": "FlexPlus",
     "tagline": "A better university portal",
-    "description": "I built a browser extension that completely overhauls the FAST student portal without requiring any changes to the university's system. It replaces the cluttered interface with a cleaner experience and adds features like a prerequisite checker, SGPA/CGPA simulator, and total-fee calculator.",
+    "description": "A browser extension that improves the student portal used by FAST-NUCES University students, adding a cleaner interface and tools for grades, course planning, prerequisites, and fees.",
     "url": "https://github.com/maybethemuhammadibrahim/flexplus",
     "year": "2026",
     "accent": "#E84B1A",
@@ -98,8 +97,7 @@
         { "name": "DOM", "icon": "dom" }
       ],
       "screenshots": [
-        "assets/projects/flexplus/template.png",
-        "assets/projects/flexplus/usage.png"
+        "template"
       ]
     }
   },
@@ -108,7 +106,7 @@
     "index": "📧",
     "title": "MailMind",
     "tagline": "Your inbox, turned into a to-do list",
-    "description": "An AI email assistant I built to turn a busy inbox into useful, structured information. It identifies tasks, meetings, orders, and other important details from emails, then prepares replies and organizes everything in one place.",
+    "description": "An AI email assistant that turns incoming emails into organized tasks, meetings, orders, and other actionable information while helping users prepare replies.",
     "url": "https://github.com/maybethemuhammadibrahim/MailMind",
     "deployed_url": "https://maybethemuhammadibrahim.github.io/MailMind-Demo/",
     "year": "2026",
@@ -134,7 +132,7 @@
         { "name": "PostgreSQL", "icon": "postgresql" }
       ],
       "screenshots": [
-        "assets/projects/mailmind/home.png"
+        "mailmind-home"
       ]
     }
   },
@@ -167,9 +165,9 @@
         { "name": "XGBoost", "icon": "xgboost" }
       ],
       "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
+        "assets/projects-optimized/generic.webp",
+        "assets/projects-optimized/generic.webp",
+        "assets/projects-optimized/generic.webp"
       ]
     }
   },
@@ -202,9 +200,9 @@
         { "name": "OpenCV", "icon": "opencv" }
       ],
       "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
+        "assets/projects-optimized/generic.webp",
+        "assets/projects-optimized/generic.webp",
+        "assets/projects-optimized/generic.webp"
       ]
     }
   },
@@ -237,8 +235,8 @@
         { "name": "Online Store", "icon": "shopify" }
       ],
       "screenshots": [
-        "assets/projects/generic.png",
-        "assets/projects/generic.png"
+        "assets/projects-optimized/generic.webp",
+        "assets/projects-optimized/generic.webp"
       ]
     }
   }

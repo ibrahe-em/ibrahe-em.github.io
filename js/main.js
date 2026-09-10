@@ -139,6 +139,44 @@
     return (shots && shots[0]) || "";
   }
 
+  /* ---------- screenshot delivery ----------
+
+     A "screenshots" entry is one of three things: a path in this repo, a full
+     URL, or — anything else — a Cloudinary public id, which config.mediaBase
+     turns into a delivery URL. The size is asked for in the URL rather than
+     stored, so the card and the modal pull two renditions of a single upload
+     and the originals never need resizing by hand. f_auto serves AVIF or WebP
+     by browser, q_auto picks the quality.
+
+     Local paths keep working untouched, so projects can move to the cloud one
+     at a time, and clearing mediaBase puts the whole site back on repo files. */
+
+  const CARD_SHOT_WIDTH = 750;   // the width the card's <img> declares
+  const MODAL_SHOT_WIDTH = 1400; // the album photo goes near full-screen
+
+  /* Stands in for a screenshot that does not load — a public id typed wrong,
+     an upload that never happened, a delivery network having a bad day. It is
+     the same placeholder the data file already reaches for, and it goes
+     through shotURL itself, so it follows the others to the cloud by changing
+     this one line. */
+  const FALLBACK_SHOT = "assets/projects-optimized/generic.webp";
+
+  function shotURL(src, width) {
+    if (!src) return "";
+    // Already addressable: a repo path, or a URL someone wrote out in full.
+    if (src.startsWith("assets/") || /^(https?:)?\/\//.test(src)) return src;
+    const base = config.mediaBase;
+    if (!base) return src;
+    return `${base.replace(/\/+$/, "")}/f_auto,q_auto,w_${width}/${src}`;
+  }
+
+  /* Inline rather than a listener: an <img> written by innerHTML can fail
+     before any handler could be attached to it. Clearing onerror first stops
+     a missing placeholder from looping. */
+  function shotFallback(width) {
+    return `onerror="this.onerror=null;this.src='${shotURL(FALLBACK_SHOT, width)}'"`;
+  }
+
   /* The hover wash behind the screenshot is a swirl PNG from scripts/swirl.py.
      A project names its own with "pattern" in projects.json; anything without
      one falls back to config.projectPattern. Either can be "" to opt out —
@@ -188,6 +226,130 @@
     return p.deployed_url ? "live" : "";
   }
 
+  /* ---------- stack icons ----------
+
+     24x24 glyphs, keyed by the "icon" field on each entry of detail.stack.
+     A tool with a mark of its own is drawn in its own colours, so the row
+     reads the way a stack list reads anywhere else. The three whose brand
+     colour cannot survive both themes take a token instead (see --logo-* in
+     styles.css), and anything the site names as a concept rather than a
+     product — Full Stack, DOM, Browser APIs — has no logo to be faithful to,
+     so it is drawn on currentColor and picks up the project's accent.
+
+     Knocked-out detail (Python's eyes, the digits on the two shields, the
+     fold in the envelope) is filled with var(--bg), the chip's own ground, so
+     it reads as a hole in both themes. The card chips and the modal's stack
+     grid both draw from here. */
+
+  // The concept glyphs share one set of stroke attributes.
+  const LINE = `fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"`;
+  // Digits and letters set inside a mark, in the site's own mono stack.
+  const MARK_TEXT = `text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700"`;
+  // Python's two halves are one shape, rotated onto itself.
+  const PY = `M6.4 3.2h11.2a2.8 2.8 0 0 1 2.8 2.8v2.8H11v2.3a2.3 2.3 0 0 1-2.3 2.3H5.9a2.3 2.3 0 0 1-2.3-2.3V6a2.8 2.8 0 0 1 2.8-2.8ZM7.85 6a.95.95 0 1 0-1.9 0 .95.95 0 0 0 1.9 0Z`;
+  // Both web badges are the one shield; the colour and the digit separate them.
+  const SHIELD = `M3.9 2.6h16.2l-1.5 16.1L12 21.4l-6.6-2.7Z`;
+  const CYLINDER = `<ellipse cx="12" cy="5.9" rx="7.4" ry="3.3"/><path d="M4.6 5.9v12.2c0 1.8 3.3 3.3 7.4 3.3s7.4-1.5 7.4-3.3V5.9"/><path d="M4.6 12c0 1.8 3.3 3.3 7.4 3.3s7.4-1.5 7.4-3.3"/>`;
+
+  const stackIcons = {
+    react: `<g fill="none" stroke="var(--logo-react)" stroke-width="1.4"><ellipse cx="12" cy="12" rx="10.1" ry="4"/><ellipse cx="12" cy="12" rx="10.1" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="10.1" ry="4" transform="rotate(120 12 12)"/></g><circle cx="12" cy="12" r="2" fill="var(--logo-react)"/>`,
+
+    nodejs: `<path fill="#5fa04e" d="M12 2.2 20.5 7.1v9.8L12 21.8 3.5 16.9V7.1Z"/>`,
+
+    javascript: `<rect x="2.6" y="2.6" width="18.8" height="18.8" rx="4.2" fill="#f7df1e"/><text x="12.2" y="16.2" ${MARK_TEXT} font-size="11" fill="#1a1814">JS</text>`,
+
+    html: `<path fill="#e34f26" d="${SHIELD}"/><text x="12" y="16.2" ${MARK_TEXT} font-size="10.5" fill="var(--bg)">5</text>`,
+
+    css: `<path fill="#1572b6" d="${SHIELD}"/><text x="12" y="16.2" ${MARK_TEXT} font-size="10.5" fill="var(--bg)">3</text>`,
+
+    // Three 120° sectors, split at 30°, 150° and 270°, under the blue hub.
+    chrome: `<path fill="#ea4335" d="M12 12 19.97 7.4A9.2 9.2 0 0 0 4.03 7.4Z"/><path fill="#34a853" d="M12 12 4.03 7.4A9.2 9.2 0 0 0 12 21.2Z"/><path fill="#fbbc04" d="M12 12v9.2a9.2 9.2 0 0 0 7.97-13.8Z"/><circle cx="12" cy="12" r="4.7" fill="var(--bg)"/><circle cx="12" cy="12" r="3.5" fill="#4285f4"/>`,
+
+    dom: `<g ${LINE}><rect x="9" y="2.6" width="6" height="5" rx="1.6"/><rect x="2.6" y="16.4" width="6" height="5" rx="1.6"/><rect x="15.4" y="16.4" width="6" height="5" rx="1.6"/><path d="M12 7.6v6.6M5.6 16.4v-2.2h12.8v2.2"/></g>`,
+
+    python: `<path fill="#3776ab" fill-rule="evenodd" d="${PY}"/><path fill="#ffd43b" fill-rule="evenodd" transform="rotate(180 12 12)" d="${PY}"/>`,
+
+    fastapi: `<path fill="#009688" d="M13.7 2 5.1 13.6h5.3L9.8 22l8.9-11.8h-5.5z"/>`,
+
+    gmail: `<rect x="2.5" y="5" width="19" height="14" rx="2.6" fill="#ea4335"/><path d="M4.6 8.4 12 13.6l7.4-5.2" fill="none" stroke="var(--bg)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`,
+
+    openai: `<g fill="#10a37f"><path d="M10.4 2.4c.9 4.2 3.4 6.7 7.6 7.6-4.2.9-6.7 3.4-7.6 7.6-.9-4.2-3.4-6.7-7.6-7.6 4.2-.9 6.7-3.4 7.6-7.6Z"/><path d="M18.2 13.8c.55 2.45 1.95 3.85 4.4 4.4-2.45.55-3.85 1.95-4.4 4.4-.55-2.45-1.95-3.85-4.4-4.4 2.45-.55 3.85-1.95 4.4-4.4Z"/></g>`,
+
+    postgresql: `<g fill="none" stroke="#336791" stroke-width="2" stroke-linecap="round">${CYLINDER}</g>`,
+
+    sqlite: `<g fill="none" stroke="var(--logo-sqlite)" stroke-width="2" stroke-linecap="round">${CYLINDER}</g>`,
+
+    scikitlearn: `<g ${LINE}><path d="M3.6 2.8v15.6c0 1.1.9 2 2 2h15.4"/></g><circle cx="8.6" cy="15.2" r="1.6" fill="#f89939"/><circle cx="12.6" cy="10.6" r="1.6" fill="#3499cd"/><circle cx="17" cy="6.4" r="1.6" fill="#f89939"/><circle cx="17.4" cy="13.6" r="1.6" fill="#3499cd"/>`,
+
+    pandas: `<g fill="var(--logo-pandas)"><rect x="3.2" y="2.6" width="4" height="18.8" rx="2"/><rect x="16.8" y="2.6" width="4" height="18.8" rx="2"/></g><rect x="10" y="2.6" width="4" height="7.2" rx="2" fill="#ffca00"/><rect x="10" y="12.4" width="4" height="9" rx="2" fill="#e70488"/>`,
+
+    numpy: `<g fill="none" stroke-width="1.9" stroke-linejoin="round"><path stroke="#4d77cf" d="M12 2.6 20.9 7v10L12 21.4 3.1 17V7Z"/><path stroke="#4dabcf" d="m3.1 7 8.9 4.4L20.9 7M12 11.4v10"/></g>`,
+
+    xgboost: `<g ${LINE}><path d="M3.2 16.6 8.8 11l3.6 3.6L20.8 6"/><path d="M15.2 6h5.6v5.6"/><path d="M3.2 20.6h17.6"/></g>`,
+
+    // Flask's own mark is black, so it rides on --ink and flips with the page.
+    flask: `<g fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.4 2.6h5.2M10.4 2.6v6.2l-5.5 9.6a2 2 0 0 0 1.7 3h10.8a2 2 0 0 0 1.7-3l-5.5-9.6V2.6"/><path d="M7.8 14.2h8.4"/></g>`,
+
+    celery: `<path fill="#37814a" d="M4.2 20.2C2.8 12.4 7.6 5 20 5c0 10.4-6 16.2-15.8 15.2Z"/><path d="M5 19.8c2.9-6 6.4-9.6 10.8-11.6" fill="none" stroke="var(--bg)" stroke-width="1.7" stroke-linecap="round"/>`,
+
+    opencv: `<g fill="none" stroke-width="2.2"><circle cx="12" cy="6.2" r="3.6" stroke="#e4342b"/><circle cx="6.2" cy="16.6" r="3.6" stroke="#1e9e4a"/><circle cx="17.8" cy="16.6" r="3.6" stroke="#2c5fd0"/></g>`,
+
+    shopify: `<path fill="#5e8e3e" d="M4.7 7.6h14.6l1 12a1.9 1.9 0 0 1-1.9 2.1H5.6a1.9 1.9 0 0 1-1.9-2.1Z"/><path d="M8.4 8.6V6.1a3.6 3.6 0 0 1 7.2 0v2.5" fill="none" stroke="#5e8e3e" stroke-width="1.9" stroke-linecap="round"/>`,
+
+    liquid: `<g ${LINE}><path d="M12 2.6c0 0 6.8 7.1 6.8 11.4a6.8 6.8 0 1 1-13.6 0C5.2 9.7 12 2.6 12 2.6Z"/></g>`,
+
+    fullstack: `<g ${LINE}><path d="M12 2.6 21.4 7 12 11.4 2.6 7Z"/><path d="m2.6 12 9.4 4.4 9.4-4.4"/><path d="m2.6 16.9 9.4 4.5 9.4-4.5"/></g>`,
+
+    cloudflare: `<path fill="#f38020" d="M7.2 19.5a4.7 4.7 0 1 1-.4-9.38 6.2 6.2 0 0 1 11.86 1.28 4.05 4.05 0 0 1-.66 8.1Z"/>`
+  };
+
+  // Stands in for a tool with no glyph of its own — the mark the cards already
+  // use for a project with an unnamed status.
+  const STACK_ICON_FALLBACK = `<path d="M12 3.6 20.4 12 12 20.4 3.6 12Z"/>`;
+
+  function stackIcon(key) {
+    return `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">${stackIcons[key] || STACK_ICON_FALLBACK}</svg>`;
+  }
+
+  /* ---------- card tag chips ----------
+
+     detail.stack already names a project's tools and hands each one an icon
+     key, so the card carries them as glyph-only chips — the footer's social
+     buttons at card scale. Spelled out on the card the names would cost four
+     lines of type to say what the marks already say, so each one goes into
+     data-label, which the CSS raises as a tooltip on hover, and into
+     aria-label for anything not looking. The modal still lists them in full.
+     A project with no stack falls back to tags, which have no glyph, so those
+     stay as labelled chips. */
+
+  function tagsMarkup(p) {
+    const stack = (p.detail && p.detail.stack) || [];
+
+    /* House of Lawn lists Shopify, E-commerce and Online Store — three names
+       for one glyph. Spelled out they are three facts; drawn, they are the
+       same bag three times, so tools sharing a glyph collapse into one chip
+       and hand their names to its label. */
+    const byIcon = new Map();
+    stack.forEach((t) => {
+      const names = byIcon.get(t.icon);
+      if (names) names.push(t.name);
+      else byIcon.set(t.icon, [t.name]);
+    });
+
+    const chips = byIcon.size
+      ? Array.from(byIcon, ([icon, names]) => {
+        const label = names.join(", ");
+        return `
+                <li class="project-tag" role="img" aria-label="${label}" data-label="${label}">${stackIcon(icon)}</li>`;
+      })
+      : (p.tags || []).map((t) => `
+                <li class="project-tag is-label">${t}</li>`);
+
+    if (!chips.length) return "";
+    return `<ul class="project-tags" aria-label="Built with">${chips.join("")}
+              </ul>`;
+  }
+
   function statusMarkup(status) {
     if (!status) return "";
     if (status === "live") {
@@ -220,7 +382,7 @@
             </span>
             <div class="project-shot">
               ${shot
-                ? `<img src="${shot}" alt="${p.title}" width="750" height="450" loading="lazy" decoding="async">`
+                ? `<img src="${shotURL(shot, CARD_SHOT_WIDTH)}" alt="${p.title}" width="750" height="450" loading="lazy" decoding="async" ${shotFallback(CARD_SHOT_WIDTH)}>`
                 : `<div class="project-shot-empty">product shot</div>`}
             </div>
           </div>
@@ -236,7 +398,7 @@
             </div>
 
             <div class="project-foot">
-              ${p.tags.length ? `<ul class="project-tags">${p.tags.map((t) => `<li>${t}</li>`).join("")}</ul>` : ""}
+              ${tagsMarkup(p)}
               ${actions ? `
               <div class="project-actions${actions === 2 ? " is-pair" : ""}">
                 ${liveUrl ? `<a class="project-action project-action-live" href="${liveUrl}" target="_blank" rel="noopener noreferrer">View Live</a>` : ""}
@@ -617,34 +779,26 @@
   const modalOverlay = $("#modalOverlay");
   const modalContent = $("#modalContent");
 
-  // Simple icon map — no external dependencies
-  const stackIcons = {
-    python: "🐍", react: "⚛️", fastapi: "⚡", gmail: "✉️",
-    openai: "🤖", postgresql: "🐘", javascript: "JS", html: "◇",
-    css: "◆", chrome: "🌐", dom: "🔗", scikitlearn: "📊",
-    pandas: "🐼", numpy: "🔢", xgboost: "🚀", flask: "🧪",
-    sqlite: "💾", celery: "🥬", opencv: "👁️"
-  };
-
   function openModal(project) {
     const d = project.detail;
     if (!d) return;
 
+    // The stack glyphs read the accent the same way the card's pills do, so a
+    // project's tools keep their colour on the way into the modal.
+    modalContent.style.setProperty("--project-accent", project.accent || "");
+
     /*
-     * To use your own screenshots, place images in:
-     *   assets/projects/[project.id]/screenshot-1.webp
-     * Then update "screenshots" in projects.json with local paths.
+     * Screenshots are named in projects.json. An entry is either a path in
+     * this repo (assets/projects-optimized/[id]/home.webp) or a Cloudinary
+     * public id, which config.mediaBase resolves — see shotURL().
      */
 
     const albumHTML = d.screenshots
-      .map((src, i) => `<img class="album-photo" data-pos="${i}" src="${src}" alt="${project.title} screenshot ${i + 1}" loading="lazy">`)
+      .map((src, i) => `<img class="album-photo" data-pos="${i}" src="${shotURL(src, MODAL_SHOT_WIDTH)}" alt="${project.title} screenshot ${i + 1}" loading="lazy" ${shotFallback(MODAL_SHOT_WIDTH)}>`)
       .join("");
 
     const stackHTML = d.stack
-      .map((tool) => {
-        const icon = stackIcons[tool.icon] || "•";
-        return `<span class="stack-item"><span class="stack-icon">${icon}</span>${tool.name}</span>`;
-      })
+      .map((tool) => `<span class="stack-item"><span class="stack-icon">${stackIcon(tool.icon)}</span>${tool.name}</span>`)
       .join("");
 
     modalContent.innerHTML = `

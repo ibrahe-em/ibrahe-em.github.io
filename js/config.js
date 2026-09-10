@@ -16,6 +16,16 @@ window.SITE_CONFIG = {
      ?tab= in the URL is ignored. The show-more fold is unaffected either way. */
   projectTabs: false,
 
+  /* Where project screenshots are delivered from. A "screenshots" entry in
+     projects.json that is not a repo path and not a full URL is treated as a
+     Cloudinary public id and hung off this base, with the size asked for in
+     the URL — one upload, a card rendition and a modal rendition.
+
+     "" — no delivery base: every entry is read as a path in this repo, which
+     is how the site ran before any of this and how it runs if the account
+     ever goes away. */
+  mediaBase: "https://res.cloudinary.com/oswyubh6/image/upload",
+
   /* The swirl that washes in behind a project screenshot on hover, for every
      project that does not name its own "pattern" in data/projects.json.
      Generate one with scripts/swirl.py — a bright swirl on a near-black
