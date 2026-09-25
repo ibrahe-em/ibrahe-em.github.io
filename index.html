@@ -40,20 +40,27 @@
 
   <main>
     <section class="intro" aria-labelledby="introName">
-      <p class="eyebrow stagger stagger-1" id="introGreeting">Hi there, I'm</p>
+      <!-- The greeting is the opening phrase of the heading, not a label over
+           it; main.js swaps its text per load. The stagger sits on
+           this wrapper rather than the h1 so the konami wobble, which also
+           animates the h1, cannot restart the entrance when it ends. -->
+      <div class="intro-title stagger stagger-1">
+        <h1 class="intro-name" id="introName">
+          <span class="intro-greeting" id="introGreeting">Hi there, I'm</span>
+          <span class="intro-first">Muhammad</span>
+          <span class="intro-last">Ibrahim</span>
+        </h1>
+      </div>
 
-      <div class="name-container stagger stagger-2">
-        <h1 class="intro-name" id="introName">Muhammad Ibrahim</h1>
-        <div class="intro-image-wrapper" id="introImageWrapper">
-          <!-- src is assigned by setIntroImage() so the viewport picks the right weight -->
-          <img
-            class="intro-image"
-            alt="cute cats"
-            loading="eager"
-            decoding="async"
-          >
-          <span class="click-counter" id="clickCounter"></span>
-        </div>
+      <div class="intro-image-wrapper stagger stagger-2" id="introImageWrapper">
+        <!-- src is assigned by setIntroImage() so the viewport picks the right weight -->
+        <img
+          class="intro-image"
+          alt="cute cats"
+          loading="eager"
+          decoding="async"
+        >
+        <span class="click-counter" id="clickCounter"></span>
       </div>
 
       <p class="intro-lead stagger stagger-3">I build AI-powered software that solves real business problems. From intelligent automation to polished web applications, I focus on delivering systems that are reliable, intuitive, and built for real users.</p>

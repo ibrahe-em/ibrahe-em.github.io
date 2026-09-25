@@ -347,15 +347,6 @@ button {
 
 /* ---------- shared type ---------- */
 
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 0 0 18px;
-}
-
 .work-heading {
   font-size: clamp(2.1rem, 5vw, 3.4rem);
   font-weight: 400;
@@ -369,53 +360,111 @@ button {
   color: var(--muted);
 }
 
-.name-container {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  gap: 20px;
-}
-
-.name-container .intro-name {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 /* ---------- intro ---------- */
 
+/* Two columns that close ranks: the name on the left, set as large as its
+   column allows, and the cat beside it, bottom-aligned so the name's baseline
+   and the image's lower edge land on one line. Underneath, the lead sits under
+   the name it explains and the skills sit under the cat.
+
+   The section is a size container so every measurement below is a share of
+   the column the name actually has, not of the viewport: --content-width
+   caps at 1240px and a vw-based size keeps climbing past it. */
 .intro {
-  min-height: 80svh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: calc(var(--pad) + 10px) var(--pad) var(--pad);
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-areas:
+    "title image"
+    "lead  tags";
+  column-gap: 56px;
+  row-gap: 40px;
+  padding: calc(var(--pad) + 24px) var(--pad) calc(var(--pad) + 16px);
+
+  /* "Muhammad" at 750 is 5.55em wide. The left column is 1.2/2.2 of the row
+     less its gutter, so 8.6cqi puts the word just inside it at every width
+     this layout runs at; 6rem is where it stops growing. */
+  --name-size: min(6rem, 8.6cqi);
 }
 
-/* The upper bound is not cosmetic. --content-width caps at 1240px (so
-   .name-container stops growing around 1370px viewports) while 7vw and the
-   image's 22vw keep climbing — past ~1650px the name's share of the row is
-   frozen and "Muhammad" needs more, so it ran into the image. Capping at
-   6.4rem keeps the longest word inside its share with a real gutter. */
+.intro-title {
+  grid-area: title;
+  align-self: end;
+}
+
 .intro-name {
-  font-size: clamp(3rem, 7vw, 6.4rem);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 0.94;
-  margin: 0 0 22px;
+  font-size: var(--name-size);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 0.92;
+  margin: 0;
 }
 
+.intro-name > span {
+  display: block;
+  transition: font-weight 0.7s var(--ease);
+}
+
+/* The greeting is the heading's own first phrase, at a third of its size and
+   in the muted ink the section headings use for their second half. */
+.intro-greeting {
+  font-size: 0.36em;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--muted);
+  margin-bottom: 0.4em;
+}
+
+/* One name, both ends of Rubik's weight axis: the first name at 750, the
+   surname at the face's lightest 300. On load they arrive swapped and trade
+   places, so the name settles into its contrast rather than appearing in it.
+   backwards fill, not both: once the animation ends the declared weights take
+   over again, which is what lets the hover swap below transition at all. */
+.intro-first {
+  font-weight: 750;
+  animation: name-settle-heavy 1.4s var(--ease) 0.25s backwards;
+}
+
+.intro-last {
+  font-weight: 300;
+  animation: name-settle-light 1.4s var(--ease) 0.25s backwards;
+}
+
+@keyframes name-settle-heavy {
+  from {
+    font-weight: 300;
+  }
+}
+
+@keyframes name-settle-light {
+  from {
+    font-weight: 750;
+  }
+}
+
+/* The image has no height of its own here: it stretches to the title's row
+   and is inset from both ends so it spans exactly the lettering. The name's
+   line box runs 0.12em past its baseline, so the lower edge lands on the
+   baseline; the greeting's capitals start 0.085em below the row's top, so the
+   upper edge lands on them. */
 .intro-image-wrapper {
-  width: clamp(96px, 22vw, 300px);
-  aspect-ratio: 300/223;
+  grid-area: image;
+  align-self: stretch;
+  width: 100%;
+  margin-top: calc(var(--name-size) * 0.085);
+  margin-bottom: calc(var(--name-size) * 0.12);
   overflow: hidden;
   border-radius: 4px;
-  flex: 0 0 auto;
-  margin-top: 0;
   cursor: pointer;
   position: relative;
 }
 
+/* Out of flow so the gif's natural size cannot push the row taller than the
+   name it is meant to match. */
 .intro-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
   width: 115%;
   height: 115%;
@@ -459,22 +508,23 @@ button {
 }
 
 .intro-lead {
-  font-size: clamp(1.05rem, 1.7vw, 1.3rem);
-  line-height: 1.62;
+  grid-area: lead;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  line-height: 1.6;
   color: var(--ink);
-  margin: 16px 0 34px;
-}
-
-.intro-lead::first-letter {
-  font-size: 1.3em;
-  font-weight: 500;
+  max-width: 36em;
+  margin: 0;
+  text-wrap: pretty;
 }
 
 .intro-tags {
+  grid-area: tags;
+  align-self: start;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 64px;
+  /* Drops the pill row onto the lead's first line rather than its top edge. */
+  padding-top: 0.3rem;
 }
 
 .intro-tags li {
@@ -1917,6 +1967,19 @@ button {
     color: var(--ink);
   }
 
+  /* Pointing at the name trades the weights back. Two-column layout only: in
+     the stacked one the cat sits in the surname's line and a heavier surname
+     would run into it. */
+  @media (min-width: 901px) {
+    .intro-name:hover .intro-first {
+      font-weight: 300;
+    }
+
+    .intro-name:hover .intro-last {
+      font-weight: 750;
+    }
+  }
+
   .scroll-cue:hover {
     color: var(--ink);
   }
@@ -1993,13 +2056,44 @@ button {
 
 /* Tablets, foldables and large phones in landscape — the old stylesheet
    jumped straight from the desktop grid to a single column. */
-@media (min-width: 641px) and (max-width: 900px) {
+@media (max-width: 900px) {
+  /* One column. The name takes the full width, and the cat moves into the
+     surname's line: "Ibrahim" at 300 is 3.155em, so the image takes what is
+     left of the row after it and a gutter, and stands on the baseline just
+     past ascender height — a word-sized picture finishing the line instead
+     of a block floating beside two. */
   .intro {
-    min-height: 70svh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "title"
+      "lead"
+      "tags";
+    row-gap: 28px;
+    /* "Muhammad" at 750 fills 92% of the column at 16.5cqi. */
+    --name-size: min(6rem, 16.5cqi);
   }
 
-  .intro-tags {
-    margin-bottom: 48px;
+  .intro-image-wrapper {
+    grid-area: title;
+    justify-self: end;
+    align-self: end;
+    width: calc(100% - var(--name-size) * 3.45);
+    height: calc(var(--name-size) * 0.8);
+    margin-top: 0;
+  }
+
+  /* A strip this wide crops hard, so the frame is centred on the gif rather
+     than carrying the desktop overscan that pushes it right and down. */
+  .intro-image {
+    width: 100%;
+    height: 100%;
+    object-position: 50% 45%;
+  }
+
+  /* At 750 the surname is half an em wider and would run into the image on
+     its way down, so here only the first name makes the entrance. */
+  .intro-last {
+    animation: none;
   }
 }
 
@@ -2021,42 +2115,11 @@ button {
     margin-bottom: 28px;
   }
 
-  /* Hero stays left-aligned like the rest of the column; the image sits
-     beside the name and shrinks enough to leave "Muhammad" room to sit
-     on its own line. */
+  /* Clears the fixed theme toggle, which sits over the top-right corner of
+     the name's column on a phone. */
   .intro {
-    min-height: 62svh;
+    row-gap: 24px;
     padding-top: calc(var(--pad) + 46px + env(safe-area-inset-top));
-  }
-
-  /* "Muhammad" is one unbreakable word ~5.6em wide, and .intro-name has
-     min-width: 0 — so if the column gets too narrow the word overflows into
-     the image instead of wrapping. The image takes a percentage (not a vw)
-     so the name's share of the row is stable, and the font is capped low
-     enough that the word still clears it at 320px. */
-  .intro-name {
-    font-size: clamp(1.55rem, 9.6vw, 3rem);
-    margin-bottom: 16px;
-  }
-
-  .name-container {
-    gap: 14px;
-    align-items: flex-start;
-  }
-
-  .intro-image-wrapper {
-    width: 28%;
-    min-width: 70px;
-    max-width: 110px;
-    margin-top: 4px;
-  }
-
-  .intro-lead {
-    margin: 12px 0 26px;
-  }
-
-  .intro-tags {
-    margin-bottom: 40px;
   }
 
   /* Sub-0.7rem type lands around 9-10px on a phone — under the legibility
